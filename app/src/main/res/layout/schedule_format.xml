@@ -9,24 +9,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/route_num"
-        android:layout_weight="0.1"
         android:fontFamily="monospace"
-        android:textSize="@dimen/route_num_size" />
+        android:textSize="@dimen/route_num_size"
+        android:gravity="center_horizontal"/>
+
     <TextView
         android:id="@+id/route_name"
         android:layout_width= "wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/route_name"
-        android:layout_weight="0.7"
-        android:textSize="@dimen/route_name_size"/>
+        android:layout_weight="1.0"
+        android:textSize="@dimen/route_name_size"
+        android:gravity="center_horizontal"/>
 
     <TextView
         android:id="@+id/route_times"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/route_time"
-        android:layout_weight="0.2"
+        android:layout_weight="1.0"
         android:textSize="@dimen/route_time_size"/>
-
-
 </LinearLayout>
