@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Snowline</string>
+    <string name="route_num">16</string>
+    <string name="route_name">University of Manitoba to the Moon</string>
+    <string name="route_time">6 mins</string>
+    <string name="hintbox">Enter Stop Number</string>
+    <string name="button">Find Schedule</string>
+
+
 </resources>

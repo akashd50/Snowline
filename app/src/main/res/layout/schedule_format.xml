@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/list_view_line">
+
+    <TextView
+        android:id="@+id/route_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/route_num"
+        android:layout_weight="0.1"
+        android:fontFamily="monospace"
+        android:textSize="@dimen/route_num_size" />
+    <TextView
+        android:id="@+id/route_name"
+        android:layout_width= "wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/route_name"
+        android:layout_weight="0.7"
+        android:textSize="@dimen/route_name_size"/>
+
+    <TextView
+        android:id="@+id/route_times"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/route_time"
+        android:layout_weight="0.2"
+        android:textSize="@dimen/route_time_size"/>
+
+
+</LinearLayout>

@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         findSchedule = findViewById(R.id.find_stop);
         scheduleList = findViewById(R.id.schedule_list);
         localList = new ArrayList<String>();
+
         scheduleListAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, localList);
         scheduleList.setAdapter(scheduleListAdapter);
         linkGenerator = new LinkGenerator();

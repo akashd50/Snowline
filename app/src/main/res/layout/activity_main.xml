@@ -15,14 +15,14 @@
         android:id="@+id/enter_stop_num"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Stop Number"
+        android:hint="@string/hintbox"
         android:layout_above="@id/find_stop"/>
 
     <Button
         android:id="@+id/find_stop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text = "Find Schedule" />
+        android:text = "@string/button" />
 
 
     <ListView
