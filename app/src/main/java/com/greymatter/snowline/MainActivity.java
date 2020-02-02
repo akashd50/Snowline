@@ -29,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private ListView scheduleList;
     private ArrayAdapter scheduleListAdapter;
     private ArrayList localList;
-    static String GET_URL = "https://api.winnipegtransit.com/v3/stops/60140/schedule.json?api-key=8G55aku8pgETTxnuI5N&start=2020-02-02T11:00:03";
+    private final Boolean isFetchComplete = new Boolean(false);
+    static String GET_URL = "https://api.winnipegtransit.com/v3/stops/60140/schedule.json?api-key=8G55aku8pgETTxnuI5N&start=2020-03-02T11:00:03";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,23 +47,31 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this,"Searching for Routes",Toast.LENGTH_LONG).show();
-                scheduleListAdapter.clear();
-                scheduleListAdapter.addAll(localList);
-                scheduleListAdapter.notifyDataSetChanged();
 
-                new Thread(new Runnable() {
+                Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             localList = getSchedule("");
-
-
                             System.out.println(localList);
+                            synchronized (isFetchComplete){
+                                isFetchComplete.notifyAll();
+                            }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
-                }).start();
+                });
+                thread.start();
+
+                synchronized (isFetchComplete) {
+                    try {
+                        isFetchComplete.wait();
+                        scheduleListAdapter.clear();
+                        scheduleListAdapter.addAll(localList);
+                        scheduleListAdapter.notifyDataSetChanged();
+                    }catch (InterruptedException e){}
+                }
             }
         });
 
@@ -80,11 +89,9 @@ public class MainActivity extends AppCompatActivity {
         if (responseCode == HttpURLConnection.HTTP_OK) { // success
             BufferedReader in = new BufferedReader(new InputStreamReader(
                     con.getInputStream()));
-            String inputLine;
-            //StringBuffer response = new StringBuffer();
 
+            String inputLine;
             while ((inputLine = in.readLine()) != null) {
-                //response.append(inputLine);
                 sample+=inputLine;
             }
             in.close();
@@ -103,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
             for(int i=0;i<rs.length();i++){
                 routeList.add(rs.getJSONObject(i).getJSONObject("route").getString("name"));
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
