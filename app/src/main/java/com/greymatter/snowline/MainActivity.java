@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList localList;
     private final Boolean isFetchComplete = new Boolean(false);
     static String GET_URL = "https://api.winnipegtransit.com/v3/stops/60140/schedule.json?api-key=8G55aku8pgETTxnuI5N&start=2020-03-02T11:00:03";
-
+    private LinkGenerator linkGenerator;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         localList = new ArrayList<String>();
         scheduleListAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, localList);
         scheduleList.setAdapter(scheduleListAdapter);
-
+        linkGenerator = new LinkGenerator();
         findSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
-                            localList = getSchedule("");
+                            localList = getSchedule(stopNumber.getText().toString());
                             System.out.println(localList);
                             synchronized (isFetchComplete){
                                 isFetchComplete.notifyAll();
@@ -78,9 +79,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ArrayList<String> getSchedule(String stopNumber) throws IOException {
+        linkGenerator = linkGenerator.generateStopScheduleLink(stopNumber).addApiKey().addTime(LocalDateTime.of(2020,02,03,11,15,00));
+        System.out.println("Current lINK : "+linkGenerator.getCurrentLink());
         ArrayList routeList = new ArrayList<String>();
         String sample = "";
-        URL obj = new URL(GET_URL);
+        URL obj = new URL(linkGenerator.getCurrentLink());
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
         //con.setRequestProperty("User-Agent", USER_AGENT);
