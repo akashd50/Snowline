@@ -3,15 +3,33 @@ package com.greymatter.snowline;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText stopNumber;
     private Button findSchedule;
     private ListView scheduleList;
+    private ArrayAdapter scheduleListAdapter;
+    private ArrayList localList;
+    static String GET_URL = "https://api.winnipegtransit.com/v3/stops/60140/schedule.json?api-key=8G55aku8pgETTxnuI5N&start=2020-02-02T11:00:03";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,5 +38,77 @@ public class MainActivity extends AppCompatActivity {
         stopNumber = findViewById(R.id.enter_stop_num);
         findSchedule = findViewById(R.id.find_stop);
         scheduleList = findViewById(R.id.schedule_list);
+        localList = new ArrayList<String>();
+        scheduleListAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, localList);
+        scheduleList.setAdapter(scheduleListAdapter);
+
+        findSchedule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this,"Searching for Routes",Toast.LENGTH_LONG).show();
+                scheduleListAdapter.clear();
+                scheduleListAdapter.addAll(localList);
+                scheduleListAdapter.notifyDataSetChanged();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            localList = getSchedule("");
+
+
+                            System.out.println(localList);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        });
+
+    }
+
+    private ArrayList<String> getSchedule(String stopNumber) throws IOException {
+        ArrayList routeList = new ArrayList<String>();
+        String sample = "";
+        URL obj = new URL(GET_URL);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("GET");
+        //con.setRequestProperty("User-Agent", USER_AGENT);
+        int responseCode = con.getResponseCode();
+        System.out.println("GET Response Code :: " + responseCode);
+        if (responseCode == HttpURLConnection.HTTP_OK) { // success
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    con.getInputStream()));
+            String inputLine;
+            //StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                //response.append(inputLine);
+                sample+=inputLine;
+            }
+            in.close();
+
+            // print result
+            System.out.println(sample);
+        } else {
+            System.out.println("GET request not worked");
+        }
+
+        try {
+            JSONObject reader  = new JSONObject(sample);
+            JSONObject stopSch = reader.getJSONObject("stop-schedule");
+            JSONArray rs = stopSch.getJSONArray("route-schedules");
+
+            for(int i=0;i<rs.length();i++){
+                routeList.add(rs.getJSONObject(i).getJSONObject("route").getString("name"));
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return routeList;
+
     }
 }
