@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1027873125429",
+    "firebase_url": "https://snowline-c4a7c.firebaseio.com",
+    "project_id": "snowline-c4a7c",
+    "storage_bucket": "snowline-c4a7c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1027873125429:android:104401f6df586465146d7c",
+        "android_client_info": {
+          "package_name": "com.greymatter.snowline"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1027873125429-aspr5neq99v8mdrk74qldbl040ddh1nc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.greymatter.snowline",
+            "certificate_hash": "5c7352948d4a07bc19da1a728ee45ee83237b65e"
+          }
+        },
+        {
+          "client_id": "1027873125429-b83nphrr389s1cdrfivm2s9affg4gee7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCA55YrApLHTevLttw1mLa1SWXLoojVQCY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1027873125429-b83nphrr389s1cdrfivm2s9affg4gee7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

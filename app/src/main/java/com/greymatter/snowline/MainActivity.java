@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         linkGenerator = new LinkGenerator();
                         linkGenerator = linkGenerator.generateStopScheduleLink(stopNumber.getText().toString()).addApiKey().
-                                    addTime(LocalDateTime.of(2020,02,03,11,15,00));
+                                    addTime(LocalDateTime.now());
 
                         String requestJson = RequestHandler.makeRequest(linkGenerator);
                         System.out.println("Current string: "+requestJson);
