@@ -1,17 +1,20 @@
-package com.greymatter.snowline;
+package com.greymatter.snowline.Objects;
+
+import java.time.LocalDateTime;
 
 public class RouteVariant {
+    private LocalDateTime arrivalDateTime;
     private String arrivalTime, variantName, routeNumber;
     public RouteVariant(String routeNumber){this.routeNumber = routeNumber;}
 
-    public String getArrivalTime() {
-        return arrivalTime;
+    public LocalDateTime getArrivalDateTime() {
+        return arrivalDateTime;
     }
 
     public String getRouteNumber(){return routeNumber;}
 
-    public void setArrivalTime(String arrivalTime) {
-        this.arrivalTime = arrivalTime;
+    public void setArrivalDateTime(LocalDateTime dt) {
+        this.arrivalDateTime = dt;
     }
 
     public String getVariantName() {

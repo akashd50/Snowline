@@ -1,14 +1,23 @@
-package com.greymatter.snowline;
+package com.greymatter.snowline.UI;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.greymatter.snowline.Data.Constants;
+import com.greymatter.snowline.JSONParser;
+import com.greymatter.snowline.LinkGenerator;
+import com.greymatter.snowline.R;
+import com.greymatter.snowline.RequestHandler;
+import com.greymatter.snowline.Objects.Route;
+import com.greymatter.snowline.Objects.RouteVariant;
+import com.greymatter.snowline.ScheduleListAdapter;
+import com.greymatter.snowline.Objects.StopSchedule;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         linkGenerator = new LinkGenerator();
-                        linkGenerator = linkGenerator.generateStopScheduleLink(stopNumber.getText().toString()).addApiKey().
-                                    addTime(LocalDateTime.now());
+                        linkGenerator = linkGenerator.generateStopScheduleLink(stopNumber.getText().toString())
+                                .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
 
                         String requestJson = RequestHandler.makeRequest(linkGenerator);
                         System.out.println("Current string: "+requestJson);

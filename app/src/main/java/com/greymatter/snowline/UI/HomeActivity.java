@@ -1,24 +1,28 @@
-package com.greymatter.snowline;
+package com.greymatter.snowline.UI;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.greymatter.snowline.R;
 
 public class HomeActivity extends Activity {
     private MapView maps;
     private GoogleMap currentMap;
     private FloatingActionButton moreOptionsButton;
+    private View.OnClickListener homeScreenClicksListener;
+    private PopupMenu optionsMenu;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,10 +38,43 @@ public class HomeActivity extends Activity {
             }
         });
 
-        moreOptionsButton.setOnClickListener(new View.OnClickListener() {
+        setUpUIElements();
+    }
+
+    private void setUpUIElements(){
+        setUpOptionsMenu();
+        setUpButtonListener();
+    }
+
+    private void setUpButtonListener(){
+        homeScreenClicksListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this,MainActivity.class));
+                switch (v.getId()){
+                    case R.id.more_options_act_home:
+                        optionsMenu.show();
+                        break;
+                }
+            }
+        };
+
+        //assign listener to the buttons
+        moreOptionsButton.setOnClickListener(homeScreenClicksListener);
+    }
+
+    private void setUpOptionsMenu(){
+        optionsMenu = new PopupMenu(this,moreOptionsButton);
+        optionsMenu.inflate(R.menu.home_screen_options_menu);
+        optionsMenu.setGravity(Gravity.RIGHT);
+        optionsMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.home_scr_find_stop_schedule:
+                        startActivity(new Intent(HomeActivity.this, MainActivity.class));
+                        break;
+                }
+                return false;
             }
         });
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="route_num_size">15dip</dimen>
-    <dimen name="route_name_size">15dip</dimen>
-    <dimen name="route_time_size">15dip</dimen>
+    <dimen name="route_num_size">20dip</dimen>
+    <dimen name="route_name_size">20dip</dimen>
+    <dimen name="route_time_size">20dip</dimen>
 </resources>

@@ -9,6 +9,6 @@
     <string name="tomorrow">Tomorrow</string>
     <string name="day_after_tomorrow">Day After Tomorrow</string>
 
-
+    <string name="home_scr_menu_find_schedule_stop_num">Find Stop Schedule</string>
 
 </resources>

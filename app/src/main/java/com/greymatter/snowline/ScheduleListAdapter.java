@@ -6,6 +6,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.greymatter.snowline.Objects.RouteVariant;
+
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class ScheduleListAdapter extends BaseAdapter {
@@ -48,7 +51,7 @@ public class ScheduleListAdapter extends BaseAdapter {
         RouteVariant routeVariant = (RouteVariant)getItem(position);
         routeNum.setText(routeVariant.getRouteNumber());
         routeName.setText(routeVariant.getVariantName());
-        routeTime.setText(routeVariant.getArrivalTime());
+        routeTime.setText(routeVariant.getArrivalDateTime().format(DateTimeFormatter.ISO_LOCAL_TIME));
 
         return vi;
     }

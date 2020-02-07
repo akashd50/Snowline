@@ -1,32 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/list_view_line">
+    android:id="@+id/list_view_line"
+    android:layout_columnWeight="3">
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/route_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/route_num"
+            android:fontFamily="monospace"
+            android:textSize="@dimen/route_num_size"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:gravity="center_horizontal"
+            android:layout_column="1"/>
 
-    <TextView
-        android:id="@+id/route_number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/route_num"
-        android:fontFamily="monospace"
-        android:textSize="@dimen/route_num_size"
-        android:gravity="center_horizontal"/>
+        <TextView
+            android:id="@+id/route_name"
+            android:layout_width= "wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/route_name"
+            android:layout_weight="1.0"
+            android:textSize="@dimen/route_name_size"
+            android:gravity="center_horizontal"
+            android:layout_column="2"/>
 
-    <TextView
-        android:id="@+id/route_name"
-        android:layout_width= "wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/route_name"
-        android:layout_weight="1.0"
-        android:textSize="@dimen/route_name_size"
-        android:gravity="center_horizontal"/>
-
-    <TextView
-        android:id="@+id/route_times"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/route_time"
-        android:layout_weight="1.0"
-        android:textSize="@dimen/route_time_size"/>
-</LinearLayout>
+        <TextView
+            android:id="@+id/route_times"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/route_time"
+            android:textSize="@dimen/route_time_size"
+            android:gravity="center_horizontal"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_column="3"/>
+    </TableRow>
+</TableLayout>

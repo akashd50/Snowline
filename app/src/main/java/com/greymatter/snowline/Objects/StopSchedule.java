@@ -1,7 +1,8 @@
-package com.greymatter.snowline;
+package com.greymatter.snowline.Objects;
+
+import com.greymatter.snowline.Objects.Route;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class StopSchedule {
 

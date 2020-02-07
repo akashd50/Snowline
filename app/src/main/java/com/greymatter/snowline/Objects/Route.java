@@ -1,4 +1,4 @@
-package com.greymatter.snowline;
+package com.greymatter.snowline.Objects;
 
 import java.util.ArrayList;
 
