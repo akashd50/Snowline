@@ -1,4 +1,4 @@
-package com.greymatter.snowline;
+package com.greymatter.snowline.Adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.greymatter.snowline.Objects.RouteVariant;
+import com.greymatter.snowline.R;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -51,7 +52,8 @@ public class ScheduleListAdapter extends BaseAdapter {
         RouteVariant routeVariant = (RouteVariant)getItem(position);
         routeNum.setText(routeVariant.getRouteNumber());
         routeName.setText(routeVariant.getVariantName());
-        routeTime.setText(routeVariant.getArrivalDateTime().format(DateTimeFormatter.ISO_LOCAL_TIME));
+
+        routeTime.setText(routeVariant.getArrivalDateTime().format(DateTimeFormatter.ofPattern("hh:mm a")));
 
         return vi;
     }

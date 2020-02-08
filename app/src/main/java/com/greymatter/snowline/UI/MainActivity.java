@@ -3,6 +3,7 @@ package com.greymatter.snowline.UI;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,24 +11,23 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.greymatter.snowline.Data.Constants;
-import com.greymatter.snowline.JSONParser;
-import com.greymatter.snowline.LinkGenerator;
+import com.greymatter.snowline.DataParsers.JSONParser;
+import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.R;
-import com.greymatter.snowline.RequestHandler;
+import com.greymatter.snowline.Handlers.RequestHandler;
 import com.greymatter.snowline.Objects.Route;
 import com.greymatter.snowline.Objects.RouteVariant;
-import com.greymatter.snowline.ScheduleListAdapter;
+import com.greymatter.snowline.Adapters.ScheduleListAdapter;
 import com.greymatter.snowline.Objects.StopSchedule;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
+    private final String TAG = "MainActivity: ";
     private EditText stopNumber;
     private Button findSchedule;
     private ListView scheduleList;
-   // private ArrayAdapter scheduleListAdapter;
     private ScheduleListAdapter myListAdapter;
     private ArrayList<RouteVariant> localList;
     private final Boolean isFetchComplete = new Boolean(false);
@@ -56,18 +56,20 @@ public class MainActivity extends AppCompatActivity {
                         linkGenerator = linkGenerator.generateStopScheduleLink(stopNumber.getText().toString())
                                 .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
 
-                        String requestJson = RequestHandler.makeRequest(linkGenerator);
-                        System.out.println("Current string: "+requestJson);
-                        StopSchedule stopSchedule = JSONParser.getStopScheduleInfo(requestJson);
-                        localList = new ArrayList<>();
-                        for(Route r : stopSchedule.getRoutes()){
-                            System.out.println(r.getRouteVariants());
-                            localList.addAll(r.getRouteVariants());
-                        }
+                        Log.v(TAG, "Fetching schedule information");
+
+                        StopSchedule stopSchedule = JSONParser.getStopScheduleInfo(RequestHandler.makeRequest(linkGenerator));
 
                         synchronized (isFetchComplete){
+                            localList = new ArrayList<>();
+                            for(Route r : stopSchedule.getRoutes()){
+                                System.out.println(r.getRouteVariants());
+                                localList.addAll(r.getRouteVariants());
+                            }
                             isFetchComplete.notifyAll();
+
                         }
+                        Log.v(TAG, "Fetching schedule information complete");
                     }
                 });
                 thread.start();

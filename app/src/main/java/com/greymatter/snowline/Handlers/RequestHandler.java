@@ -1,4 +1,6 @@
-package com.greymatter.snowline;
+package com.greymatter.snowline.Handlers;
+
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,7 +9,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
 
 public class RequestHandler {
 
@@ -16,7 +17,7 @@ public class RequestHandler {
     }
 
     public static String makeRequest(LinkGenerator linkGenerator){
-        System.out.println("Current lINK : "+linkGenerator.getCurrentLink());
+        Log.v("RequestHandler",linkGenerator.getCurrentLink());
         String inputLine = "";
         String sample = "";
 

@@ -15,6 +15,8 @@
         android:id="@+id/enter_stop_num"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/button_margin_v1"
+        android:background="@drawable/button_background"
         android:hint="@string/hintbox"
         android:layout_above="@id/find_stop"/>
 
@@ -22,8 +24,9 @@
         android:id="@+id/find_stop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/button_margin_v1"
+        android:background="@drawable/button_background"
         android:text = "@string/button" />
-
 
     <ListView
         android:id="@+id/schedule_list"

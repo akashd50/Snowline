@@ -3,4 +3,5 @@
     <dimen name="route_num_size">20dip</dimen>
     <dimen name="route_name_size">20dip</dimen>
     <dimen name="route_time_size">20dip</dimen>
+    <dimen name="button_margin_v1">15dip</dimen>
 </resources>
