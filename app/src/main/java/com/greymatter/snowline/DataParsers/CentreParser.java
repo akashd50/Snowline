@@ -7,21 +7,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CentreParser extends JSONParser {
-    private Centre centre;
-    public CentreParser(){
-        centre = new Centre();}
 
-    public Centre parseCenterInfo(JSONObject object){
+    public static Centre parseCenterInfo(JSONObject object){
+        Centre centre = new Centre();
         try {
-            centre = utmInfo(object.getJSONObject(UTM));
-            centre = geographicInfo(object.getJSONObject(GEOGRAPHIC));
+            centre = utmInfo(centre, object.getJSONObject(UTM));
+            centre = geographicInfo(centre, object.getJSONObject(GEOGRAPHIC));
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return centre;
     }
 
-    public Centre utmInfo(JSONObject object){
+    public static Centre utmInfo(Centre centre, JSONObject object){
         try {
             centre.setZone(object.getString(ZONE));
             centre.setUtmX(object.getString(UTMX));
@@ -32,7 +30,7 @@ public class CentreParser extends JSONParser {
         return centre;
     }
 
-    public Centre geographicInfo(JSONObject object){
+    public static Centre geographicInfo(Centre centre, JSONObject object){
         try {
             centre.setZone(object.getString(LATITUDE));
             centre.setUtmX(object.getString(LONGITUDE));

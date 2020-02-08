@@ -7,24 +7,16 @@ import org.json.JSONObject;
 import static com.greymatter.snowline.Data.Constants.*;
 
 public class StopParser extends JSONParser {
-    private Stop stop;
-    private StreetParser streetParser;
-    private CentreParser centreParser;
 
-    public StopParser(){
-        stop = new Stop();
-        streetParser = new StreetParser();
-        centreParser = new CentreParser();
-    }
-
-    public Stop parseStopInfo(JSONObject object){
+    public static Stop parseStopInfo(JSONObject object){
+        Stop stop = new Stop();
         try {
             stop.setName(object.getString(NAME));
             stop.setNumber(object.getString(NUMBER));
             stop.setName(object.getString(DIRECTION));
-            stop.setStreet(streetParser.parseStreetInfo(object.getJSONObject(STREET)));
-            stop.setCrossStreet(streetParser.parseStreetInfo(object.getJSONObject(CROSS_STREET)));
-            stop.setCentre(centreParser.parseCenterInfo(object.getJSONObject(CENTER)));
+            stop.setStreet(StreetParser.parseStreetInfo(object.getJSONObject(STREET)));
+            stop.setCrossStreet(StreetParser.parseStreetInfo(object.getJSONObject(CROSS_STREET)));
+            stop.setCentre(CentreParser.parseCenterInfo(object.getJSONObject(CENTER)));
         } catch (JSONException e) {
             e.printStackTrace();
         }

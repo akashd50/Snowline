@@ -28,9 +28,14 @@ public class Constants {
     public static final String NUMBER = "number";
     public static final String TIMES = "times";
     public static final String ARRIVAL = "arrival";
+    public static final String DEPARTURE = "departure";
     public static final String SCHEDULED = "scheduled";
+    public static final String ESTIMATED = "estimated";
     public static final String VARIANT = "variant";
     public static final String SCHEDULED_STOPS = "scheduled-stops";
     public static final String DIRECTION = "direction";
-
+    public static final String CANCELLED = "cancelled";
+    public static final String BUS = "bus";
+    public static final String BIKE_RACK = "bike-rack";
+    public static final String WIFI = "wifi";
 }

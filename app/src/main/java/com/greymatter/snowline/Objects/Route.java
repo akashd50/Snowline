@@ -3,32 +3,39 @@ package com.greymatter.snowline.Objects;
 import java.util.ArrayList;
 
 public class Route {
-    private String routeName;
-    private String routeNumber;
+    private String key, name, number;
     private ArrayList<RouteVariant> routeVariants;
 
     public Route(String keyName, String routeVariant, String schTime, String number){
-        routeName = keyName;
-        routeNumber = number;
+        name = keyName;
+        this.number = number;
         routeVariants = new ArrayList<>();
     }
 
     public Route(){routeVariants = new ArrayList<>();}
 
-    public String getRouteNumber() {
-        return routeNumber;
+    public String getNumber() {
+        return number;
     }
 
-    public void setRouteNumber(String routeNumber) {
-        this.routeNumber = routeNumber;
+    public void setNumber(String number) {
+        this.number = number;
     }
 
-    public String getRouteName() {
-        return routeName;
+    public String getName() {
+        return name;
     }
 
-    public void setRouteName(String routeName) {
-        this.routeName = routeName;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public ArrayList<RouteVariant> getRouteVariants() {
@@ -40,7 +47,7 @@ public class Route {
     }
 
     public String toString(){
-        return this.routeName;
+        return this.name;
     }
 
 

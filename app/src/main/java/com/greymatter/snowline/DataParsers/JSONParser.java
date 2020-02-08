@@ -32,12 +32,12 @@ public class JSONParser {
             toReturn.setStopName(stop.getString(NAME));
             for(int i=0;i<routeSchedules.length();i++){
                 Route route = new Route();
-                route.setRouteName(routeSchedules.getJSONObject(i).getJSONObject(ROUTE).getString(NAME));
-                route.setRouteNumber(routeSchedules.getJSONObject(i).getJSONObject(ROUTE).getString(NUMBER));
+                route.setName(routeSchedules.getJSONObject(i).getJSONObject(ROUTE).getString(NAME));
+                route.setNumber(routeSchedules.getJSONObject(i).getJSONObject(ROUTE).getString(NUMBER));
                 JSONArray scheduledStops = routeSchedules.getJSONObject(i).getJSONArray(SCHEDULED_STOPS);
                 ArrayList<RouteVariant> variants = new ArrayList<>();
                 for(int j = 0;j<scheduledStops.length();j++){
-                    RouteVariant variant = new RouteVariant(route.getRouteNumber());
+                    RouteVariant variant = new RouteVariant(route.getNumber());
                     String dateTime = scheduledStops.getJSONObject(j).getJSONObject(TIMES).getJSONObject(ARRIVAL).getString(SCHEDULED);
                     variant.setArrivalDateTime(LocalDateTime.parse(dateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                     variant.setVariantName(scheduledStops.getJSONObject(j).getJSONObject(VARIANT).getString(NAME));
