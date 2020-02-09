@@ -1,24 +1,20 @@
 package com.greymatter.snowline.Objects;
 
-import java.time.LocalDateTime;
-
-public class RouteVariant {
+public class RouteVariant extends Route{
     private boolean cancelled;
-    private LocalDateTime arrivalDateTime; //to be deleted
     private Times timeinfo;
-    private String key, arrivalTime, variantKey, variantName, routeNumber;//to be deleted
+    private String key, variantKey, variantName;
     private Bus busInfo;
-    public RouteVariant(String routeNumber){this.routeNumber = routeNumber;}
+
+    public RouteVariant(String rKey, String rName, String rNumber){super(rKey, rNumber, rName);}
+    public RouteVariant(Route route){super(route.getKey(), route.getNumber(), route.getName());}
     public RouteVariant(){}
 
-    public LocalDateTime getArrivalDateTime() {
-        return arrivalDateTime;
-    }
-
-    public String getRouteNumber(){return routeNumber;}
-
-    public void setArrivalDateTime(LocalDateTime dt) {
-        this.arrivalDateTime = dt;
+    public RouteVariant setRouteInfo(Route route){
+        super.setKey(route.getKey());
+        super.setName(route.getName());
+        super.setNumber(route.getNumber());
+        return this;
     }
 
     public String getVariantName() {
@@ -70,6 +66,6 @@ public class RouteVariant {
     }
 
     public String toString(){
-        return this.routeNumber + " - " +this.variantName + " -> " + this.arrivalTime;
+        return super.getNumber() + " - " + this.variantName + " -> " + this.timeinfo.getEstimatedArrival();
     }
 }

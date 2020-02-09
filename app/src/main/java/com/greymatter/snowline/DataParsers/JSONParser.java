@@ -19,7 +19,33 @@ public class JSONParser {
         //currentSring = input;
     }
 
-    public static StopSchedule getStopScheduleInfo(String currentSring){
+    public static StopSchedule getStopScheduleUpdated(String scheduleInfo){
+        StopSchedule toReturn = new StopSchedule();
+        try{
+            JSONObject stopSchedule  = new JSONObject(scheduleInfo).getJSONObject(STOP_SCHEDULE);
+
+            toReturn.setStop(StopParser.parseStopInfo(stopSchedule.getJSONObject(STOP)));
+
+            JSONArray routeSchedules = stopSchedule.getJSONArray(ROUTE_SCHEDULES);
+
+            for(int i=0;i<routeSchedules.length();i++){
+                //for each route under the current stop
+                JSONObject routeScheduleCurr = routeSchedules.getJSONObject(i);
+                Route currentRoute = RouteParser.parseRouteInfo(routeScheduleCurr.getJSONObject(ROUTE));
+
+                JSONArray scheduledStops = routeScheduleCurr.getJSONArray(SCHEDULED_STOPS);
+                for(int j=0;j<scheduledStops.length();j++){
+                    //for each variant under the current route, add it to the list
+                    JSONObject currentVariant = scheduledStops.getJSONObject(i);
+                    toReturn.addRouteVariant(RouteVariantParser.parseRouteVariantInfo(currentVariant).setRouteInfo(currentRoute));
+                }
+            }
+        }catch (JSONException e){}
+        return toReturn;
+    }
+
+
+/*    public static StopSchedule getStopScheduleInfo(String currentSring){
         StopSchedule toReturn = new StopSchedule();
         try {
             JSONObject reader  = new JSONObject(currentSring);
@@ -50,5 +76,5 @@ public class JSONParser {
             e.printStackTrace();
         }
         return toReturn;
-    }
+    }*/
 }

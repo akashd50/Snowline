@@ -1,35 +1,28 @@
 package com.greymatter.snowline.Objects;
 
-import com.greymatter.snowline.Objects.Route;
-
 import java.util.ArrayList;
 
 public class StopSchedule {
-
-    private String stopName, stopNumber;
-    private ArrayList<Route> routes;
+    private Stop stop;
+    private ArrayList<RouteVariant> routes;
 
     public StopSchedule(){
         routes = new ArrayList<>();
     }
 
-    public void setStopName(String stopName) {
-        this.stopName = stopName;
+    public void addRouteVariant(RouteVariant routeVariant){
+        routes.add(routeVariant);
     }
 
-    public void setStopNumber(String stopNumber) {
-        this.stopNumber = stopNumber;
+    public Stop getStop() {
+        return stop;
     }
 
-    public String getStopName() {
-        return stopName;
+    public void setStop(Stop stop) {
+        this.stop = stop;
     }
 
-    public String getStopNumber() {
-        return stopNumber;
-    }
-
-    public ArrayList<Route> getRoutes() {
+    public ArrayList<RouteVariant> getRoutes() {
         return routes;
     }
 }

@@ -4,15 +4,13 @@ import java.util.ArrayList;
 
 public class Route {
     private String key, name, number;
-    private ArrayList<RouteVariant> routeVariants;
 
-    public Route(String keyName, String routeVariant, String schTime, String number){
-        name = keyName;
+    public Route(String key, String number, String name){
+        this.key = key;
+        this.name = name;
         this.number = number;
-        routeVariants = new ArrayList<>();
     }
-
-    public Route(){routeVariants = new ArrayList<>();}
+    public Route(){}
 
     public String getNumber() {
         return number;
@@ -38,17 +36,7 @@ public class Route {
         this.key = key;
     }
 
-    public ArrayList<RouteVariant> getRouteVariants() {
-        return routeVariants;
-    }
-
-    public void setRouteVariants(ArrayList<RouteVariant> routeVariants) {
-        this.routeVariants = routeVariants;
-    }
-
     public String toString(){
         return this.name;
     }
-
-
 }

@@ -5,9 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.greymatter.snowline.Data.Constants;
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<RouteVariant> localList;
     private final Boolean isFetchComplete = new Boolean(false);
     private LinkGenerator linkGenerator;
+    private ArrayList<Boolean> listClicks;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +44,27 @@ public class MainActivity extends AppCompatActivity {
         scheduleList = findViewById(R.id.schedule_list);
 
         localList = new ArrayList<RouteVariant>();
-        myListAdapter = new ScheduleListAdapter(this.getLayoutInflater(), R.layout.schedule_format);
+        myListAdapter = new ScheduleListAdapter(scheduleList, this.getLayoutInflater(), R.layout.schedule_format);
         scheduleList.setAdapter(myListAdapter);
+
+        scheduleList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(listClicks.get(position)) {
+                    listClicks.set(position,false);
+
+                    TextView routeInfo = view.findViewById(R.id.route_info_view);
+                    routeInfo.setText("");
+                }
+                else {
+                    listClicks.set(position,true);
+                    TextView routeInfo = view.findViewById(R.id.route_info_view);
+                    routeInfo.setText("Sample text");
+                }
+
+                view.invalidate();
+            }
+        });
 
         findSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,16 +80,19 @@ public class MainActivity extends AppCompatActivity {
 
                         Log.v(TAG, "Fetching schedule information");
 
-                        StopSchedule stopSchedule = JSONParser.getStopScheduleInfo(RequestHandler.makeRequest(linkGenerator));
+                        StopSchedule stopSchedule = JSONParser.getStopScheduleUpdated(RequestHandler.makeRequest(linkGenerator));
 
                         synchronized (isFetchComplete){
                             localList = new ArrayList<>();
-                            for(Route r : stopSchedule.getRoutes()){
-                                System.out.println(r.getRouteVariants());
-                                localList.addAll(r.getRouteVariants());
-                            }
-                            isFetchComplete.notifyAll();
+                            localList.addAll(stopSchedule.getRoutes());
 
+                            listClicks = new ArrayList<>();
+                            for(int i=0;i<localList.size();i++){
+                                listClicks.add(new Boolean(false));
+                            }
+                            myListAdapter.updateClickList(listClicks);
+
+                            isFetchComplete.notifyAll();
                         }
                         Log.v(TAG, "Fetching schedule information complete");
                     }

@@ -15,7 +15,7 @@ public class Bus {
         this.key = key;
     }
 
-    public boolean isBikeRack() {
+    public boolean hasBikeRack() {
         return bikeRack;
     }
 
@@ -23,7 +23,7 @@ public class Bus {
         this.bikeRack = bikeRack;
     }
 
-    public boolean isWifi() {
+    public boolean hasWifi() {
         return wifi;
     }
 
