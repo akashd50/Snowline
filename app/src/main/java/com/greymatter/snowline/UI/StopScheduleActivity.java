@@ -7,11 +7,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.greymatter.snowline.Adapters.ScheduleListRAdapter;
@@ -20,16 +17,14 @@ import com.greymatter.snowline.DataParsers.JSONParser;
 import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.R;
 import com.greymatter.snowline.Handlers.RequestHandler;
-import com.greymatter.snowline.Objects.Route;
 import com.greymatter.snowline.Objects.RouteVariant;
-import com.greymatter.snowline.Adapters.ScheduleListAdapter;
 import com.greymatter.snowline.Objects.StopSchedule;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
-    private final String TAG = "MainActivity: ";
+public class StopScheduleActivity extends AppCompatActivity {
+    private final String TAG = "StopScheduleActivity: ";
     private EditText stopNumber;
     private Button findSchedule;
     //private ListView scheduleList;
@@ -84,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         findSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this,"Searching for Routes",Toast.LENGTH_LONG).show();
+                Toast.makeText(StopScheduleActivity.this,"Searching for Routes",Toast.LENGTH_LONG).show();
 
                 Thread thread = new Thread(new Runnable() {
                     @Override

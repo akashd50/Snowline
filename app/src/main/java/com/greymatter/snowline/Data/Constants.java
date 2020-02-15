@@ -9,6 +9,7 @@ public class Constants {
     //parser constants
     public static final String STOP_SCHEDULE = "stop-schedule";
     public static final String STOP = "stop";
+    public static final String STOPS = "stops";
     public static final String STREET = "street";
     public static final String CROSS_STREET = "cross-street";
     public static final String CENTER = "centre";

@@ -17,12 +17,29 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.greymatter.snowline.Data.Constants;
+import com.greymatter.snowline.DataParsers.JSONParser;
+import com.greymatter.snowline.DataParsers.StopParser;
+import com.greymatter.snowline.Handlers.LinkGenerator;
+import com.greymatter.snowline.Handlers.RequestHandler;
+import com.greymatter.snowline.Objects.Stop;
+import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener,
         OnMapReadyCallback{
@@ -33,12 +50,14 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     private SupportMapFragment mapFragment;
     private Location lastKnownLocation;
     private FusedLocationProviderClient fusedLocationClient;
+    private LinkGenerator linkGenerator;
+    private ArrayList<Stop> nearbyStops;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         moreOptionsButton = findViewById(R.id.more_options_act_home);
-
+        linkGenerator = new LinkGenerator();
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView);
@@ -96,7 +115,14 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.home_scr_find_stop_schedule:
-                        startActivity(new Intent(HomeActivity.this, MainActivity.class));
+                        startActivity(new Intent(HomeActivity.this, StopScheduleActivity.class));
+                        break;
+                    case R.id.home_scr_find_nearby_stops:
+                        if (lastKnownLocation != null) {
+                            findNearbyStops();
+                           // currentMap.addMarker(new MarkerOptions().position(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude())).title("My Location"));
+                            //currentMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude())));
+                        }
                         break;
                 }
                 return false;
@@ -104,6 +130,46 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         });
     }
 
+    public void findNearbyStops() {
+        if(nearbyStops == null) nearbyStops=new ArrayList<>();
+        linkGenerator = linkGenerator.generateStopLink().apiKey()
+                .latLon(lastKnownLocation.getLatitude()+"", lastKnownLocation.getLongitude()+"")
+                .distance("100");
+
+        final Boolean isFetchComplete = new Boolean(false);
+        final StringBuilder stringBuilder = new StringBuilder();
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (isFetchComplete){
+                    stringBuilder.append(RequestHandler.makeRequest(linkGenerator));
+                    isFetchComplete.notifyAll();
+                }
+            }
+        });
+        thread.start();
+
+        synchronized (isFetchComplete) {
+            try {
+                isFetchComplete.wait();
+            }catch (InterruptedException e){}
+        }
+
+        try {
+            JSONObject result = new JSONObject(stringBuilder.toString());
+            JSONArray stopsArray = result.getJSONArray(Constants.STOPS);
+            for(int i=0; i < stopsArray.length(); i++) {
+                nearbyStops.add(StopParser.parseStopInfo(stopsArray.getJSONObject(i)));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        for(Stop s:nearbyStops) {
+            currentMap.addMarker(new MarkerOptions().position
+                    (new LatLng(Double.parseDouble(s.getCentre().getLatitude()),Double.parseDouble(s.getCentre().getLongitude())))
+                    .title("My Location"));
+        }
+    }
     @Override
     protected void onStart() {
         mapFragment.onStart();

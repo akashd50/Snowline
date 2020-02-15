@@ -3,4 +3,7 @@
     <item
         android:id="@+id/home_scr_find_stop_schedule"
         android:title="@string/home_scr_menu_find_schedule_stop_num"/>
+    <item
+        android:id="@+id/home_scr_find_nearby_stops"
+        android:title="@string/home_scr_menu_find_nearby_stops"/>
 </menu>
