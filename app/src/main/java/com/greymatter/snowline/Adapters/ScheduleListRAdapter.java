@@ -64,4 +64,8 @@ public class ScheduleListRAdapter extends RecyclerView.Adapter<ScheduleListRAdap
             lineView = v;
         }
     }
+
+    public void clear(){
+        this.localList.clear();
+    }
 }

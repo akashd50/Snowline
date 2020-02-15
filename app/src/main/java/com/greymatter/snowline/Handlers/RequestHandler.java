@@ -16,14 +16,15 @@ public class RequestHandler {
 
     }
 
-    public static String makeRequest(final LinkGenerator linkGenerator){
+    public static StringBuilder makeRequest(final LinkGenerator linkGenerator){
         final Boolean isFetchComplete = new Boolean(false);
         final StringBuilder stringBuilder = new StringBuilder();
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 synchronized (isFetchComplete){
-                    stringBuilder.append(RequestHandler.makeRequest(linkGenerator));
+                    stringBuilder.append(RequestHandler.makeRequestHelper(linkGenerator));
                     isFetchComplete.notifyAll();
                 }
             }
@@ -33,10 +34,10 @@ public class RequestHandler {
         synchronized (isFetchComplete) {
             try {
                 isFetchComplete.wait();
-                return stringBuilder.toString();
+                return stringBuilder;
             }catch (InterruptedException e){}
         }
-       return "";
+       return null;
     }
 
     public static String makeRequestHelper(LinkGenerator linkGenerator){

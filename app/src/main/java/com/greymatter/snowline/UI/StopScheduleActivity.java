@@ -53,37 +53,15 @@ public class StopScheduleActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(StopScheduleActivity.this,"Searching for Routes",Toast.LENGTH_LONG).show();
-
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        linkGenerator = new LinkGenerator();
-                        linkGenerator = linkGenerator.generateStopScheduleLink(stopNumber.getText().toString()).apiKey()
-                                .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
-
+                linkGenerator = new LinkGenerator();
+                linkGenerator.generateStopScheduleLink(stopNumber.getText().toString()).apiKey()
+                        .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
                         Log.v(TAG, "Fetching schedule information");
 
-                        StopSchedule stopSchedule = JSONParser.getStopScheduleUpdated(RequestHandler.makeRequestHelper(linkGenerator));
+                StopSchedule stopSchedule = JSONParser.getStopScheduleUpdated(RequestHandler.makeRequest(linkGenerator).toString());
 
-                        synchronized (isFetchComplete){
-                            localList = new ArrayList<>();
-                            localList.addAll(stopSchedule.getRoutes());
-                            isFetchComplete.notifyAll();
-                        }
-                        Log.v(TAG, "Fetching schedule information complete");
-                    }
-                });
-                thread.start();
-
-                synchronized (isFetchComplete) {
-                    try {
-                        isFetchComplete.wait();
-                        mAdapter.updateLocalList(localList);
-                        mAdapter.notifyDataSetChanged();
-                    }catch (InterruptedException e){
-
-                    }
-                }
+                mAdapter.updateLocalList(stopSchedule.getRoutes());
+                mAdapter.notifyDataSetChanged();
             }
         });
     }

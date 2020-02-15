@@ -23,24 +23,7 @@ public class HomeActivityHelper {
                 .latLon(location.getLatitude()+"", location.getLongitude()+"")
                 .distance("500");
 
-        final Boolean isFetchComplete = new Boolean(false);
-        final StringBuilder stringBuilder = new StringBuilder();
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (isFetchComplete){
-                    stringBuilder.append(RequestHandler.makeRequestHelper(linkGenerator));
-                    isFetchComplete.notifyAll();
-                }
-            }
-        });
-        thread.start();
-
-        synchronized (isFetchComplete) {
-            try {
-                isFetchComplete.wait();
-            }catch (InterruptedException e){}
-        }
+        final StringBuilder stringBuilder = RequestHandler.makeRequest(linkGenerator);
 
         try {
             JSONObject result = new JSONObject(stringBuilder.toString());
