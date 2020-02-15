@@ -8,10 +8,12 @@
     tools:context=".UI.HomeActivity">
 
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
+    <fragment
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:id="@+id/mapView"
+        tools:context=".UI.HomeActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/more_options_act_home"

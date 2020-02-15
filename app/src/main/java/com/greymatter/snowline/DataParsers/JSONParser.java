@@ -1,5 +1,7 @@
 package com.greymatter.snowline.DataParsers;
 
+import android.util.Log;
+
 import com.greymatter.snowline.Objects.Route;
 import com.greymatter.snowline.Objects.RouteVariant;
 import com.greymatter.snowline.Objects.StopSchedule;
@@ -36,8 +38,12 @@ public class JSONParser {
                 JSONArray scheduledStops = routeScheduleCurr.getJSONArray(SCHEDULED_STOPS);
                 for(int j=0;j<scheduledStops.length();j++){
                     //for each variant under the current route, add it to the list
-                    JSONObject currentVariant = scheduledStops.getJSONObject(i);
-                    toReturn.addRouteVariant(RouteVariantParser.parseRouteVariantInfo(currentVariant).setRouteInfo(currentRoute));
+                    JSONObject currentVariant = scheduledStops.getJSONObject(j);
+                    RouteVariant toAdd = RouteVariantParser.parseRouteVariantInfo(currentVariant);
+                    toAdd.setRouteInfo(currentRoute);
+                    toReturn.addRouteVariant(toAdd);
+
+                    Log.v("JSON Parser ", toAdd.toString());
                 }
             }
         }catch (JSONException e){}

@@ -1,68 +1,69 @@
 package com.greymatter.snowline.UI;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
+import androidx.fragment.app.FragmentActivity;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.greymatter.snowline.R;
 
-public class HomeActivity extends Activity implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
-    private MapView maps;
+public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener,
+        OnMapReadyCallback{
     private GoogleMap currentMap;
     private FloatingActionButton moreOptionsButton;
     private View.OnClickListener homeScreenClicksListener;
     private PopupMenu optionsMenu;
+    private SupportMapFragment mapFragment;
+    private Location lastKnownLocation;
+    private FusedLocationProviderClient fusedLocationClient;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        maps = findViewById(R.id.mapView);
         moreOptionsButton = findViewById(R.id.more_options_act_home);
 
-        maps.onCreate(savedInstanceState);
-        maps.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-                currentMap = googleMap;
-                if (ContextCompat.checkSelfPermission(HomeActivity.this,
-                        Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(HomeActivity.this,
-                            Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    } else {
-                        ActivityCompat.requestPermissions(HomeActivity.this,
-                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},66);
+
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.mapView);
+        mapFragment.onCreate(savedInstanceState);
+        mapFragment.getMapAsync(this);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            lastKnownLocation = location;
+                            Log.v("HOME ACTIVITY", lastKnownLocation.toString());
+                        }
                     }
-                } else {
-                    // Permission has already been granted
-                }
-
-            }
-        });
-
+                });
         setUpUIElements();
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         currentMap.setMyLocationEnabled(true);
-
     }
 
     private void setUpUIElements(){
@@ -105,43 +106,43 @@ public class HomeActivity extends Activity implements GoogleMap.OnMyLocationButt
 
     @Override
     protected void onStart() {
-        maps.onStart();
+        mapFragment.onStart();
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        maps.onStop();
+        mapFragment.onStop();
         super.onStop();
     }
 
     @Override
     protected void onResume() {
-        maps.onResume();
+        mapFragment.onResume();
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        maps.onPause();
+        mapFragment.onPause();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        maps.onDestroy();
+        mapFragment.onDestroy();
         super.onDestroy();
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
-        maps.onSaveInstanceState(outState);
+        mapFragment.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onLowMemory() {
-        maps.onLowMemory();
+        mapFragment.onLowMemory();
         super.onLowMemory();
     }
 
@@ -154,4 +155,22 @@ public class HomeActivity extends Activity implements GoogleMap.OnMyLocationButt
     public boolean onMyLocationButtonClick() {
         return false;
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        currentMap = googleMap;
+        if (ContextCompat.checkSelfPermission(HomeActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(HomeActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+            } else {
+                ActivityCompat.requestPermissions(HomeActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},66);
+            }
+        } else {
+            // Permission has already been granted
+        }
+    }
+
 }
