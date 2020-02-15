@@ -20,7 +20,7 @@ public class ScheduleListAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
     private ListView listView;
     private int listRowLayoutID;
-    private ArrayList<Boolean> listClicks;
+    //private ArrayList<Boolean> listClicks;
 
     public ScheduleListAdapter(ListView listView, LayoutInflater inflater, int listRowLayoutId){
         //super();
@@ -28,16 +28,14 @@ public class ScheduleListAdapter extends BaseAdapter {
         listRowLayoutID = listRowLayoutId;
         layoutInflater = inflater;
         this.listView = listView;
-        listClicks = new ArrayList<>();
-        this.listClicks = new ArrayList<>();
-
-
+        //listClicks = new ArrayList<>();
+        //this.listClicks = new ArrayList<>();
 
         //onClickListener();
     }
 
     public void updateClickList(ArrayList<Boolean> list){
-        this.listClicks = list;
+        //this.listClicks = list;
     }
 
     @Override
@@ -64,12 +62,12 @@ public class ScheduleListAdapter extends BaseAdapter {
         TextView routeNum = vi.findViewById(R.id.route_number);
         TextView routeName = vi.findViewById(R.id.route_name);
         TextView routeTime = vi.findViewById(R.id.route_times);
-        TextView routeInfo = vi.findViewById(R.id.route_info_view);
-        if(position<listClicks.size() && listClicks.get(position)){
-            routeInfo.setVisibility(View.VISIBLE);
-        }else{
-            routeInfo.setVisibility(View.INVISIBLE);
-        }
+        //TextView routeInfo = vi.findViewById(R.id.route_info_view);
+        //if(position<listClicks.size() && listClicks.get(position)){
+        //    routeInfo.setVisibility(View.VISIBLE);
+       // }else{
+      //      routeInfo.setVisibility(View.INVISIBLE);
+       // }
 
         RouteVariant routeVariant = (RouteVariant)getItem(position);
         routeNum.setText(routeVariant.getNumber());

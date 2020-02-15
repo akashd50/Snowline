@@ -28,9 +28,17 @@
         android:background="@drawable/button_background"
         android:text = "@string/button" />
 
-    <ListView
+   <!-- <ListView
         android:id="@+id/schedule_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content" />-->
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/schedule_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
+            android:clickable="true"
+            android:focusable="true"/>
     </LinearLayout>
     </RelativeLayout>
