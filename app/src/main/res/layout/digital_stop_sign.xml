@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dialog_background">
+
+    <TextView
+        android:id="@+id/digital_stop_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="North Pole"/>
+    <TextView
+        android:id="@+id/digital_stop_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00000"/>
+    <TextView
+        android:id="@+id/digital_stop_routes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="16,21,07"/>
+
+</LinearLayout>

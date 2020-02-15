@@ -1,6 +1,7 @@
 package com.greymatter.snowline.UI;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -11,6 +12,8 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -24,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -39,6 +43,7 @@ import com.greymatter.snowline.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -169,11 +174,39 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
             e.printStackTrace();
         }
         for(Stop s:nearbyStops) {
+
             currentMap.addMarker(new MarkerOptions().position
                     (new LatLng(Double.parseDouble(s.getCentre().getLatitude()),Double.parseDouble(s.getCentre().getLongitude())))
                     .title(s.getName()));
         }
+        currentMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                for(Stop s : nearbyStops) {
+                    if (marker.getTitle().compareTo(s.getName()) == 0){
+                        Log.v("home activity",s.getNumber());
+                        // get stop number
+                        generateDigitalStopSign(s).show();
+                        // new prompt "Find Schedule"
+                        // find schedule
+                    }
+                }
+                return false;
+            }
+        });
     }
+     public AlertDialog generateDigitalStopSign(Stop stop) {
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+        View view = HomeActivity.this.getLayoutInflater().inflate(R.layout.digital_stop_sign,null);
+        TextView stopName = view.findViewById(R.id.digital_stop_name);
+        stopName.setText(stop.getName());
+        TextView stopNumber = view.findViewById(R.id.digital_stop_number);
+        stopNumber.setText(stop.getNumber());
+        builder.setView(view);
+        return builder.create();
+     }
     @Override
     protected void onStart() {
         mapFragment.onStart();
