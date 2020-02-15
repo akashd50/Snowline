@@ -34,7 +34,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.greymatter.snowline.Data.Constants;
 import com.greymatter.snowline.DataParsers.JSONParser;
 import com.greymatter.snowline.DataParsers.StopParser;
+import com.greymatter.snowline.Handlers.HomeActivityHelper;
 import com.greymatter.snowline.Handlers.LinkGenerator;
+import com.greymatter.snowline.Handlers.MapHandler;
 import com.greymatter.snowline.Handlers.RequestHandler;
 import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.Objects.StopSchedule;
@@ -50,16 +52,14 @@ import java.util.ArrayList;
 
 public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener,
         OnMapReadyCallback{
-    private GoogleMap currentMap;
     private FloatingActionButton moreOptionsButton;
     private View.OnClickListener homeScreenClicksListener;
     private PopupMenu optionsMenu;
     private SupportMapFragment mapFragment;
-    private Location lastKnownLocation;
-    private LatLng lastKnownLatLng;
     private FusedLocationProviderClient fusedLocationClient;
     private LinkGenerator linkGenerator;
     private ArrayList<Stop> nearbyStops;
+    private MapHandler mapHandler;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,16 +71,16 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                 .findFragmentById(R.id.mapView);
         mapFragment.onCreate(savedInstanceState);
         mapFragment.getMapAsync(this);
+        mapHandler = new MapHandler(HomeActivity.this, HomeActivity.this, mapFragment);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            lastKnownLocation = location;
-                            Log.v("HOME ACTIVITY", lastKnownLocation.toString());
+                            mapHandler.fusedLocationClientOnSuccess(location);
+                            Log.v("HOME ACTIVITY", mapHandler.getLastKnownLocation().toString());
                         }
                     }
                 });
@@ -90,7 +90,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        currentMap.setMyLocationEnabled(true);
+        mapHandler.onRequestPermissionsResult(requestCode);
     }
 
     private void setUpUIElements(){
@@ -109,7 +109,6 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                 }
             }
         };
-
         //assign listener to the buttons
         moreOptionsButton.setOnClickListener(homeScreenClicksListener);
     }
@@ -126,11 +125,13 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                         startActivity(new Intent(HomeActivity.this, StopScheduleActivity.class));
                         break;
                     case R.id.home_scr_find_nearby_stops:
-                        if (lastKnownLocation != null) {
-                            lastKnownLatLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+                        if (mapHandler.getLastKnownLocation() != null) {
                             findNearbyStops();
-                            currentMap.addCircle(new CircleOptions().center(lastKnownLatLng).radius(100).strokeColor(Color.rgb( 30,30,30)).strokeWidth(5).fillColor(Color.argb(100, 60,60,60)));
-                            currentMap.animateCamera(CameraUpdateFactory.newLatLng(lastKnownLatLng));
+                            mapHandler.getCurrentMap().addCircle(new CircleOptions().
+                                    center(mapHandler.getLastKnownLatLng()).
+                                    radius(100).strokeColor(Color.rgb( 30,30,30)).
+                                    strokeWidth(5).fillColor(Color.argb(100, 60,60,60)));
+                            mapHandler.getCurrentMap().animateCamera(CameraUpdateFactory.newLatLng(mapHandler.getLastKnownLatLng()));
                         }
                         break;
                 }
@@ -140,46 +141,15 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     }
 
     public void findNearbyStops() {
-        if(nearbyStops == null) nearbyStops=new ArrayList<>();
-        linkGenerator = linkGenerator.generateStopLink().apiKey()
-                .latLon(lastKnownLocation.getLatitude()+"", lastKnownLocation.getLongitude()+"")
-                .distance("500");
+        nearbyStops = HomeActivityHelper.getNearbyStops(mapHandler.getLastKnownLocation());
 
-        final Boolean isFetchComplete = new Boolean(false);
-        final StringBuilder stringBuilder = new StringBuilder();
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (isFetchComplete){
-                    stringBuilder.append(RequestHandler.makeRequest(linkGenerator));
-                    isFetchComplete.notifyAll();
-                }
-            }
-        });
-        thread.start();
-
-        synchronized (isFetchComplete) {
-            try {
-                isFetchComplete.wait();
-            }catch (InterruptedException e){}
-        }
-
-        try {
-            JSONObject result = new JSONObject(stringBuilder.toString());
-            JSONArray stopsArray = result.getJSONArray(Constants.STOPS);
-            for(int i=0; i < stopsArray.length(); i++) {
-                nearbyStops.add(StopParser.parseStopInfo(stopsArray.getJSONObject(i)));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         for(Stop s:nearbyStops) {
-
-            currentMap.addMarker(new MarkerOptions().position
+            mapHandler.getCurrentMap().addMarker(new MarkerOptions().position
                     (new LatLng(Double.parseDouble(s.getCentre().getLatitude()),Double.parseDouble(s.getCentre().getLongitude())))
                     .title(s.getName()));
         }
-        currentMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+
+        mapHandler.getCurrentMap().setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 for(Stop s : nearbyStops) {
@@ -195,9 +165,8 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
             }
         });
     }
-     public AlertDialog generateDigitalStopSign(Stop stop) {
 
-
+    public AlertDialog generateDigitalStopSign(Stop stop) {
         AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
         View view = HomeActivity.this.getLayoutInflater().inflate(R.layout.digital_stop_sign,null);
         TextView stopName = view.findViewById(R.id.digital_stop_name);
@@ -206,7 +175,8 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         stopNumber.setText(stop.getNumber());
         builder.setView(view);
         return builder.create();
-     }
+    }
+
     @Override
     protected void onStart() {
         mapFragment.onStart();
@@ -261,20 +231,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        currentMap = googleMap;
-        if (ContextCompat.checkSelfPermission(HomeActivity.this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(HomeActivity.this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-            } else {
-                ActivityCompat.requestPermissions(HomeActivity.this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},66);
-            }
-        } else {
-            currentMap.setMyLocationEnabled(true);
-            // Permission has already been granted
-        }
+        mapHandler.onMapReady(googleMap);
     }
 
 }

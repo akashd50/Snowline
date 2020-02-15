@@ -11,6 +11,7 @@ public class Constants {
     public static final String STOP = "stop";
     public static final String STOPS = "stops";
     public static final String STREET = "street";
+    public static final String COVERAGE = "coverage";
     public static final String CROSS_STREET = "cross-street";
     public static final String CENTER = "centre";
     public static final String KEY = "key";

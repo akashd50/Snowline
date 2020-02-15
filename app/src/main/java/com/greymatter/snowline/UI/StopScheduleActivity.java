@@ -27,13 +27,9 @@ public class StopScheduleActivity extends AppCompatActivity {
     private final String TAG = "StopScheduleActivity: ";
     private EditText stopNumber;
     private Button findSchedule;
-    //private ListView scheduleList;
-    //private ScheduleListAdapter myListAdapter;
     private ArrayList<RouteVariant> localList;
     private final Boolean isFetchComplete = new Boolean(false);
     private LinkGenerator linkGenerator;
-    //private ArrayList<Boolean> listClicks;
-
     private RecyclerView recyclerView;
     private ScheduleListRAdapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -43,7 +39,6 @@ public class StopScheduleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         stopNumber = findViewById(R.id.enter_stop_num);
         findSchedule = findViewById(R.id.find_stop);
-        //scheduleList = findViewById(R.id.schedule_list);
         recyclerView = (RecyclerView) findViewById(R.id.schedule_list);
 
         localList = new ArrayList<RouteVariant>();
@@ -53,28 +48,6 @@ public class StopScheduleActivity extends AppCompatActivity {
 
         mAdapter = new ScheduleListRAdapter();
         recyclerView.setAdapter(mAdapter);
-
-        /*myListAdapter = new ScheduleListAdapter(scheduleList, this.getLayoutInflater(), R.layout.schedule_format);
-        scheduleList.setAdapter(myListAdapter);
-
-        scheduleList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                *//*if(listClicks.get(position)) {
-                    listClicks.set(position,false);
-
-                    TextView routeInfo = view.findViewById(R.id.route_info_view);
-                    routeInfo.setText("");
-                }
-                else {
-                    listClicks.set(position,true);
-                    TextView routeInfo = view.findViewById(R.id.route_info_view);
-                    routeInfo.setText("Sample text");
-                }*//*
-
-                //scheduleList.postInvalidate();
-            }
-        });*/
 
         findSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,18 +63,11 @@ public class StopScheduleActivity extends AppCompatActivity {
 
                         Log.v(TAG, "Fetching schedule information");
 
-                        StopSchedule stopSchedule = JSONParser.getStopScheduleUpdated(RequestHandler.makeRequest(linkGenerator));
+                        StopSchedule stopSchedule = JSONParser.getStopScheduleUpdated(RequestHandler.makeRequestHelper(linkGenerator));
 
                         synchronized (isFetchComplete){
                             localList = new ArrayList<>();
                             localList.addAll(stopSchedule.getRoutes());
-
-//                            listClicks = new ArrayList<>();
-//                            for(int i=0;i<localList.size();i++){
-//                                listClicks.add(new Boolean(false));
-//                            }
-//                            myListAdapter.updateClickList(listClicks);
-
                             isFetchComplete.notifyAll();
                         }
                         Log.v(TAG, "Fetching schedule information complete");
@@ -112,13 +78,11 @@ public class StopScheduleActivity extends AppCompatActivity {
                 synchronized (isFetchComplete) {
                     try {
                         isFetchComplete.wait();
-//                        myListAdapter.clear();
-//                        myListAdapter.addAll(localList);
-//                        myListAdapter.notifyDataSetChanged();
                         mAdapter.updateLocalList(localList);
                         mAdapter.notifyDataSetChanged();
-                        //mAdapter.notify();
-                    }catch (InterruptedException e){}
+                    }catch (InterruptedException e){
+
+                    }
                 }
             }
         });

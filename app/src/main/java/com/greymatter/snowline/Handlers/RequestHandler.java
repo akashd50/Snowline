@@ -16,7 +16,30 @@ public class RequestHandler {
 
     }
 
-    public static String makeRequest(LinkGenerator linkGenerator){
+    public static String makeRequest(final LinkGenerator linkGenerator){
+        final Boolean isFetchComplete = new Boolean(false);
+        final StringBuilder stringBuilder = new StringBuilder();
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (isFetchComplete){
+                    stringBuilder.append(RequestHandler.makeRequest(linkGenerator));
+                    isFetchComplete.notifyAll();
+                }
+            }
+        });
+        thread.start();
+
+        synchronized (isFetchComplete) {
+            try {
+                isFetchComplete.wait();
+                return stringBuilder.toString();
+            }catch (InterruptedException e){}
+        }
+       return "";
+    }
+
+    public static String makeRequestHelper(LinkGenerator linkGenerator){
         Log.v("RequestHandler",linkGenerator.getCurrentLink());
         String inputLine = "";
         String sample = "";

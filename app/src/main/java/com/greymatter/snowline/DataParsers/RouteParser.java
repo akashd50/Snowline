@@ -12,6 +12,7 @@ public class RouteParser {
             route.setName(object.getString(NAME));
             route.setNumber(object.getString(NUMBER));
             route.setKey(object.getString(KEY));
+            route.setCoverage(object.getString(COVERAGE));
         } catch (JSONException e) {
             e.printStackTrace();
         }

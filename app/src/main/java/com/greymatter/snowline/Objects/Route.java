@@ -3,7 +3,7 @@ package com.greymatter.snowline.Objects;
 import java.util.ArrayList;
 
 public class Route {
-    private String key, name, number;
+    private String key, name, number, coverage;
 
     public Route(String key, String number, String name){
         this.key = key;
@@ -14,6 +14,14 @@ public class Route {
 
     public String getNumber() {
         return number;
+    }
+
+    public String getCoverage() {
+        return coverage;
+    }
+
+    public void setCoverage(String coverage) {
+        this.coverage = coverage;
     }
 
     public void setNumber(String number) {

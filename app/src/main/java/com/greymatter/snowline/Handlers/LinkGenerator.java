@@ -28,13 +28,23 @@ public class LinkGenerator {
         return this;
     }
 
+    public LinkGenerator generateRoutesLink () {
+        this.updateCurrentLink(Constants.BASE_ADDRESS + "/v3/routes.json");
+        return this;
+    }
+
+    public LinkGenerator stop(String stop) {
+        this.updateCurrentLink("&stop="+stop);
+        return this;
+    }
+
     public LinkGenerator latLon (String lat, String lon) {
-        this.currentLink+="&lat="+lat+"&lon="+lon;
+        this.updateCurrentLink("&lat="+lat+"&lon="+lon);
         return this;
     }
 
     public LinkGenerator distance (String distance) {
-        this.currentLink+="&distance="+distance;
+        this.updateCurrentLink("&distance="+distance);
         return this;
     }
 
