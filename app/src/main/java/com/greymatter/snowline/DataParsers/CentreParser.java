@@ -32,8 +32,8 @@ public class CentreParser extends JSONParser {
 
     public static Centre geographicInfo(Centre centre, JSONObject object){
         try {
-            centre.setZone(object.getString(LATITUDE));
-            centre.setUtmX(object.getString(LONGITUDE));
+            centre.setLatitude(object.getString(LATITUDE));
+            centre.setLongitude(object.getString(LONGITUDE));
         } catch (JSONException e) {
             e.printStackTrace();
         }

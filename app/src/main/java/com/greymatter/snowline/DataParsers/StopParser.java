@@ -13,7 +13,7 @@ public class StopParser extends JSONParser {
         try {
             stop.setName(object.getString(NAME));
             stop.setNumber(object.getString(NUMBER));
-            stop.setName(object.getString(DIRECTION));
+            stop.setDirection(object.getString(DIRECTION));
             stop.setStreet(StreetParser.parseStreetInfo(object.getJSONObject(STREET)));
             stop.setCrossStreet(StreetParser.parseStreetInfo(object.getJSONObject(CROSS_STREET)));
             stop.setCentre(CentreParser.parseCenterInfo(object.getJSONObject(CENTER)));

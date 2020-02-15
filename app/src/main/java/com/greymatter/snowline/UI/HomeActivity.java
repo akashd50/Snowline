@@ -3,6 +3,7 @@ package com.greymatter.snowline.UI;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -49,6 +51,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     private PopupMenu optionsMenu;
     private SupportMapFragment mapFragment;
     private Location lastKnownLocation;
+    private LatLng lastKnownLatLng;
     private FusedLocationProviderClient fusedLocationClient;
     private LinkGenerator linkGenerator;
     private ArrayList<Stop> nearbyStops;
@@ -119,9 +122,10 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                         break;
                     case R.id.home_scr_find_nearby_stops:
                         if (lastKnownLocation != null) {
+                            lastKnownLatLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
                             findNearbyStops();
-                           // currentMap.addMarker(new MarkerOptions().position(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude())).title("My Location"));
-                            //currentMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude())));
+                            currentMap.addCircle(new CircleOptions().center(lastKnownLatLng).radius(100).strokeColor(Color.rgb( 30,30,30)).strokeWidth(5).fillColor(Color.argb(100, 60,60,60)));
+                            currentMap.animateCamera(CameraUpdateFactory.newLatLng(lastKnownLatLng));
                         }
                         break;
                 }
@@ -134,7 +138,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         if(nearbyStops == null) nearbyStops=new ArrayList<>();
         linkGenerator = linkGenerator.generateStopLink().apiKey()
                 .latLon(lastKnownLocation.getLatitude()+"", lastKnownLocation.getLongitude()+"")
-                .distance("100");
+                .distance("500");
 
         final Boolean isFetchComplete = new Boolean(false);
         final StringBuilder stringBuilder = new StringBuilder();
@@ -167,7 +171,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         for(Stop s:nearbyStops) {
             currentMap.addMarker(new MarkerOptions().position
                     (new LatLng(Double.parseDouble(s.getCentre().getLatitude()),Double.parseDouble(s.getCentre().getLongitude())))
-                    .title("My Location"));
+                    .title(s.getName()));
         }
     }
     @Override
@@ -235,6 +239,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},66);
             }
         } else {
+            currentMap.setMyLocationEnabled(true);
             // Permission has already been granted
         }
     }
