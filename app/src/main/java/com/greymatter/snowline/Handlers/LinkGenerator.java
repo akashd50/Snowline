@@ -14,9 +14,31 @@ public class LinkGenerator {
     }
 
     public LinkGenerator generateStopScheduleLink (String stopNumber){
-        this.updateCurrentLink(Constants.BASE_ADDRESS + "/v3/stops/"+ stopNumber + "/schedule.json?api-key="+Constants.API_KEY);
+        this.updateCurrentLink(Constants.BASE_ADDRESS + "/v3/stops/"+ stopNumber + "/schedule.json");
         return this;
     }
+
+    public LinkGenerator apiKey () {
+        this.updateCurrentLink("?api-key="+Constants.API_KEY);
+        return this;
+    }
+
+    public LinkGenerator generateStopLink () {
+        this.updateCurrentLink(Constants.BASE_ADDRESS + "/v3/stops.json");
+        return this;
+    }
+
+    public LinkGenerator latLon (String lat, String lon) {
+        this.currentLink+="&lat="+lat+"&lon="+lon;
+        return this;
+    }
+
+    public LinkGenerator distance (String distance) {
+        this.currentLink+="&distance="+distance;
+        return this;
+    }
+
+
 
     public LinkGenerator usage(int usage){
         if(usage==Constants.USAGE_LONG) this.updateCurrentLink("&usage=long");

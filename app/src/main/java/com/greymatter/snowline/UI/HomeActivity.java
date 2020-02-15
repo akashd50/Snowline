@@ -1,7 +1,10 @@
 package com.greymatter.snowline.UI;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -10,6 +13,8 @@ import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -17,7 +22,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.greymatter.snowline.R;
 
-public class HomeActivity extends Activity {
+public class HomeActivity extends Activity implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
     private MapView maps;
     private GoogleMap currentMap;
     private FloatingActionButton moreOptionsButton;
@@ -35,10 +40,29 @@ public class HomeActivity extends Activity {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 currentMap = googleMap;
+                if (ContextCompat.checkSelfPermission(HomeActivity.this,
+                        Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(HomeActivity.this,
+                            Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    } else {
+                        ActivityCompat.requestPermissions(HomeActivity.this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},66);
+                    }
+                } else {
+                    // Permission has already been granted
+                }
+
             }
         });
 
         setUpUIElements();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        currentMap.setMyLocationEnabled(true);
+
     }
 
     private void setUpUIElements(){
@@ -119,5 +143,15 @@ public class HomeActivity extends Activity {
     public void onLowMemory() {
         maps.onLowMemory();
         super.onLowMemory();
+    }
+
+    @Override
+    public void onMyLocationClick(@NonNull Location location) {
+
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        return false;
     }
 }

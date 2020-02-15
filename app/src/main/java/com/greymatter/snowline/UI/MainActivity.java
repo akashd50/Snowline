@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         linkGenerator = new LinkGenerator();
-                        linkGenerator = linkGenerator.generateStopScheduleLink(stopNumber.getText().toString())
+                        linkGenerator = linkGenerator.generateStopScheduleLink(stopNumber.getText().toString()).apiKey()
                                 .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
 
                         Log.v(TAG, "Fetching schedule information");
