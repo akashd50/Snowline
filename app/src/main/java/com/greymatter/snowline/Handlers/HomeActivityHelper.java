@@ -18,12 +18,12 @@ import java.util.ArrayList;
 
 public class HomeActivityHelper {
 
-    public static ArrayList<Stop> getNearbyStops(Location location){
+    public static ArrayList<Stop> getNearbyStops(Location location, int radius){
         ArrayList<Stop> nearbyStops = new ArrayList<>();
         final LinkGenerator linkGenerator = new LinkGenerator();
         linkGenerator.generateStopLink().apiKey()
                 .latLon(location.getLatitude()+"", location.getLongitude()+"")
-                .distance("500");
+                .distance(radius+"");
 
         final StringBuilder stringBuilder = RequestHandler.makeRequest(linkGenerator);
 

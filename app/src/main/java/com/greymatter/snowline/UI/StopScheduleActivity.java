@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +38,10 @@ public class StopScheduleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent intent = getIntent();
+        String stopNumberFromHome = intent.getStringExtra("stop_number");
+
         stopNumber = findViewById(R.id.enter_stop_num);
         findSchedule = findViewById(R.id.find_stop);
         recyclerView = (RecyclerView) findViewById(R.id.schedule_list);
@@ -53,16 +58,24 @@ public class StopScheduleActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(StopScheduleActivity.this,"Searching for Routes",Toast.LENGTH_LONG).show();
-                linkGenerator = new LinkGenerator();
-                linkGenerator.generateStopScheduleLink(stopNumber.getText().toString()).apiKey()
-                        .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
-                        Log.v(TAG, "Fetching schedule information");
-
-                StopSchedule stopSchedule = JSONParser.getStopScheduleUpdated(RequestHandler.makeRequest(linkGenerator).toString());
-
-                mAdapter.updateLocalList(stopSchedule.getRoutes());
-                mAdapter.notifyDataSetChanged();
+                fetchStopSchedule(stopNumber.getText().toString());
             }
         });
+
+        if(stopNumberFromHome!=null && stopNumberFromHome.compareTo("")!=0){
+            fetchStopSchedule(stopNumberFromHome);
+        }
+    }
+
+    private void fetchStopSchedule(String stopNumber){
+        linkGenerator = new LinkGenerator();
+        linkGenerator.generateStopScheduleLink(stopNumber).apiKey()
+                .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
+        Log.v(TAG, "Fetching schedule information");
+
+        StopSchedule stopSchedule = JSONParser.getStopScheduleUpdated(RequestHandler.makeRequest(linkGenerator).toString());
+
+        mAdapter.updateLocalList(stopSchedule.getRoutes());
+        mAdapter.notifyDataSetChanged();
     }
 }

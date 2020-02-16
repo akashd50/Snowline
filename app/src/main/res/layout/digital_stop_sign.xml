@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:id="@+id/dialog_stop_sign_layout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/dialog_background">
+    <Toolbar
+        android:id="@+id/digital_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-    <TextView
-        android:id="@+id/digital_stop_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="North Pole"/>
-    <TextView
+    <Button
         android:id="@+id/digital_stop_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="00000"/>
-    <TextView
-        android:id="@+id/digital_stop_routes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
         android:text=""/>
+
+    <LinearLayout
+        android:id="@+id/digital_all_routes_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+    </LinearLayout>
 
 </LinearLayout>
