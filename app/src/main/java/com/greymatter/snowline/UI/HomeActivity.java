@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +39,7 @@ import com.greymatter.snowline.Handlers.HomeActivityHelper;
 import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.Handlers.MapHandler;
 import com.greymatter.snowline.Handlers.RequestHandler;
+import com.greymatter.snowline.Objects.Route;
 import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.R;
@@ -49,6 +51,7 @@ import org.w3c.dom.Text;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener,
         OnMapReadyCallback{
@@ -142,8 +145,10 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
     public void findNearbyStops() {
         nearbyStops = HomeActivityHelper.getNearbyStops(mapHandler.getLastKnownLocation());
+        final HashMap<String,ArrayList<Route>> nearbyStopsAllRoutes = new HashMap<>();
 
         for(Stop s:nearbyStops) {
+            nearbyStopsAllRoutes.put(s.getNumber(),HomeActivityHelper.getRoutes(s));
             mapHandler.getCurrentMap().addMarker(new MarkerOptions().position
                     (new LatLng(Double.parseDouble(s.getCentre().getLatitude()),Double.parseDouble(s.getCentre().getLongitude())))
                     .title(s.getName()));
@@ -156,7 +161,9 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                     if (marker.getTitle().compareTo(s.getName()) == 0){
                         Log.v("home activity",s.getNumber());
                         // get stop number
-                        generateDigitalStopSign(s).show();
+                        AlertDialog dialog = generateDigitalStopSign(s,nearbyStopsAllRoutes.get(s.getNumber()));
+                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialog.show();
                         // new prompt "Find Schedule"
                         // find schedule
                     }
@@ -166,9 +173,13 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         });
     }
 
-    public AlertDialog generateDigitalStopSign(Stop stop) {
+    public AlertDialog generateDigitalStopSign(Stop stop, ArrayList<Route> stopRoutes) {
         AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
         View view = HomeActivity.this.getLayoutInflater().inflate(R.layout.digital_stop_sign,null);
+        TextView allRoutes = view.findViewById(R.id.digital_stop_routes);
+        for(Route r:stopRoutes) {
+            allRoutes.append(r.getNumber()+", ");
+        }
         TextView stopName = view.findViewById(R.id.digital_stop_name);
         stopName.setText(stop.getName());
         TextView stopNumber = view.findViewById(R.id.digital_stop_number);

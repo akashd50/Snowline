@@ -27,6 +27,7 @@ public class Constants {
     public static final String ROUTE_SCHEDULES = "route-schedules";
     public static final String NAME = "name";
     public static final String ROUTE = "route";
+    public static final String ROUTES = "routes";
     public static final String NUMBER = "number";
     public static final String TIMES = "times";
     public static final String ARRIVAL = "arrival";
