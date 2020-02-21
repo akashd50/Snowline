@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -194,7 +195,8 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         for(Stop s: nearbyStops) {
             MarkerOptions marker = new MarkerOptions()
                     .position(new LatLng(Double.parseDouble(s.getCentre().getLatitude()),Double.parseDouble(s.getCentre().getLongitude())))
-                    .title(s.getName());
+                    .title(s.getName())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_icon_new));
 
             mapHandler.getCurrentMap().addMarker(marker).setTag(s);
         }
