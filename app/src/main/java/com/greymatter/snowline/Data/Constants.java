@@ -1,5 +1,9 @@
 package com.greymatter.snowline.Data;
 
+import android.app.Activity;
+import android.content.Context;
+import android.util.DisplayMetrics;
+
 public class Constants {
     public static final String BASE_ADDRESS = "https://api.winnipegtransit.com";
     public static final String API_KEY = "8G55aku8pgETTxnuI5N";
@@ -41,4 +45,18 @@ public class Constants {
     public static final String BUS = "bus";
     public static final String BIKE_RACK = "bike-rack";
     public static final String WIFI = "wifi";
+
+    public static int getDisplayHeight(Activity activity){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        return height;
+    }
+
+    public static int getDisplayWidth(Activity activity){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = displayMetrics.heightPixels;
+        return width;
+    }
 }

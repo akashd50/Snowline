@@ -28,14 +28,74 @@
         android:focusable="true"
         app:srcCompat="@android:drawable/arrow_up_float" />
 
-    <SeekBar
-        android:id="@+id/home_proximity_slider"
+
+    <LinearLayout
+        android:id="@+id/slider_layout"
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="100dp"
-        android:paddingBottom="200dp"
-        android:layout_marginRight="-120dp"
         android:layout_alignParentEnd="true"
-        android:rotation="-90"
-        android:layout_above="@id/more_options_act_home"/>
+        android:visibility="invisible"
+        android:layout_above="@id/more_options_act_home">
+
+        <Button
+            android:id="@+id/slider_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:background="@drawable/arrow_button_background"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_above="@id/slider_current_value"/>
+
+        <Button
+            android:id="@+id/slider_current_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/transparent_background"
+            android:layout_centerInParent="true"/>
+
+        <Button
+            android:id="@+id/slider_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/arrow_button_background"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/slider_current_value"/>
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/planning_tab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/planning_tab_drag_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_background"
+            android:layout_centerHorizontal="true"/>
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/planning_tab_search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/planning_tab_drag_view"/>
+
+        <Button
+            android:id="@+id/planning_tab_find_nearby_stops"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/planning_tab_search_bar"
+            android:background="@drawable/button_background" />
+    </RelativeLayout>
 </RelativeLayout>

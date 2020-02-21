@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <Button
+        android:id="@+id/slider_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+"
+        android:background="@drawable/arrow_button_background"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="20dp"
+        android:layout_above="@id/slider_current_value"/>
+
+    <TextView
+        android:id="@+id/slider_current_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="500"
+        android:layout_margin="20dp"
+        android:background="@drawable/arrow_button_background"
+        android:layout_centerInParent="true"/>
+
+    <Button
+        android:id="@+id/slider_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:layout_margin="20dp"
+        android:background="@drawable/arrow_button_background"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/slider_current_value"/>
+</RelativeLayout>

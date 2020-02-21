@@ -63,6 +63,7 @@ public class StopScheduleActivity extends AppCompatActivity {
         });
 
         if(stopNumberFromHome!=null && stopNumberFromHome.compareTo("")!=0){
+            stopNumber.setText(stopNumberFromHome);
             fetchStopSchedule(stopNumberFromHome);
         }
     }
