@@ -168,24 +168,8 @@ public class PlanningTab implements KeyboardVisibilityListener {
         mainLayout.setLayoutParams(layoutParams);
     }
 
-
     public void onKeyboardVisibilityChanged(boolean keyboardVisible) {
-//        if(keyboardVisible){
-//            if(!searchBarHasFocus) {
-//                searchBarHasFocus = true;
-//                Log.v(PLANNING_TAB, "Focused Search bar");
-//                animateLayout(300, 0);
-//            }
-//        }else{
-//            if(searchBarHasFocus){
-//                searchBarHasFocus = false;
-//                Log.v(PLANNING_TAB, "Not Focused Search bar");
-//
-//                Log.v(PLANNING_TAB, "Location Before Anim - "+ locationBeforeAnim.y);
-//
-//                animateLayout(300, locationBeforeAnim.y);
-//            }
-//        }
+
     }
 
     public void onTouchEvent(View v, MotionEvent event){
