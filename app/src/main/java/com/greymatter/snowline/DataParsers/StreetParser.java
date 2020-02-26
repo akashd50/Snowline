@@ -7,7 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class StreetParser extends JSONParser {
-    public static Street parseStreetInfo(JSONObject object){
+    public static Street parse(JSONObject object){
         Street street = new Street();
         try {
             street.setKey(object.getString(KEY));

@@ -15,14 +15,20 @@ import android.widget.Toast;
 import com.greymatter.snowline.Adapters.ScheduleListRAdapter;
 import com.greymatter.snowline.Data.Constants;
 import com.greymatter.snowline.DataParsers.JSONParser;
+import com.greymatter.snowline.DataParsers.StopScheduleParser;
 import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.R;
 import com.greymatter.snowline.Handlers.RequestHandler;
 import com.greymatter.snowline.Objects.RouteVariant;
 import com.greymatter.snowline.Objects.StopSchedule;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+
+import static com.greymatter.snowline.Data.Constants.STOP_SCHEDULE;
 
 public class StopScheduleActivity extends AppCompatActivity {
     private final String TAG = "StopScheduleActivity: ";
@@ -57,7 +63,8 @@ public class StopScheduleActivity extends AppCompatActivity {
         findSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(StopScheduleActivity.this,"Searching for Routes",Toast.LENGTH_LONG).show();
+                Toast.makeText(StopScheduleActivity.this,"Searching for Routes",
+                        Toast.LENGTH_LONG).show();
                 fetchStopSchedule(stopNumber.getText().toString());
             }
         });
@@ -74,7 +81,14 @@ public class StopScheduleActivity extends AppCompatActivity {
                 .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
         Log.v(TAG, "Fetching schedule information");
 
-        StopSchedule stopSchedule = JSONParser.getStopScheduleUpdated(RequestHandler.makeRequest(linkGenerator).toString());
+        String json = RequestHandler.makeRequest(linkGenerator).toString();
+        StopSchedule stopSchedule = null;
+        try {
+            stopSchedule = StopScheduleParser.parse(new JSONObject(json)
+                    .getJSONObject(STOP_SCHEDULE));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         mAdapter.updateLocalList(stopSchedule.getRoutes());
         mAdapter.notifyDataSetChanged();

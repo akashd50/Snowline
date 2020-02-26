@@ -8,7 +8,7 @@ import org.json.JSONObject;
 import static com.greymatter.snowline.Data.Constants.*;
 
 public class TimeParser extends JSONObject {
-    public static Times parseTimesInfo(JSONObject object){
+    public static Times parse(JSONObject object){
         Times times = new Times();
         try {
             parseArrivalInfo(times,object.getJSONObject(ARRIVAL));

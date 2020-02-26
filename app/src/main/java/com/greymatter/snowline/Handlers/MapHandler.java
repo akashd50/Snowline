@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -31,7 +32,23 @@ public class MapHandler {
         this.activity = activity;
         this.context = context;
         mapFragment = fragment;
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
+    }
 
+    public void fusedLocationClientListener(){
+        fusedLocationClient.getLastLocation()
+        .addOnSuccessListener(activity, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    fusedLocationClientOnSuccess(location);
+                    Log.v("HOME ACTIVITY", getLastKnownLocation().toString());
+                    if(currentMap!=null){
+                        currentMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastKnownLatLng(),15));
+                    }
+                }
+            }
+        });
     }
 
     public void fusedLocationClientOnSuccess(Location lastKnownLocation){

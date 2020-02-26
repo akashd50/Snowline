@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import static com.greymatter.snowline.Data.Constants.*;
 
 public class BusParser extends JSONObject {
-    public static Bus parseBusInfo(JSONObject object){
+    public static Bus parse(JSONObject object){
         Bus bus = new Bus();
         try {
             bus.setKey(object.getString(KEY));

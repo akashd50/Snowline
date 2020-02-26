@@ -10,6 +10,11 @@ public class Constants {
     public static final int USAGE_SHORT = 1001;
     public static final int USAGE_LONG = 1002;
 
+    //Activity Tags
+    public static final String HOME_ACTIVITY = "Home Activity: INFO";
+    public static final String HOME_ACTIVITY_HELPER = "Home Activity Helper: INFO";
+    public static final String PLANNING_TAB = "Planning Tab: INFO";
+
     //parser constants
     public static final String STOP_SCHEDULE = "stop-schedule";
     public static final String STOP = "stop";
@@ -58,5 +63,27 @@ public class Constants {
         activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.heightPixels;
         return width;
+    }
+
+    public static int getRealDisplayHeight(Activity activity){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        return height;
+    }
+
+    public static int getRealDisplayWidth(Activity activity){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
+        int width = displayMetrics.heightPixels;
+        return width;
+    }
+
+    public static int getNavigationBarHeight(Activity activity) {
+        int usableHeight = getDisplayHeight(activity);
+        int realHeight = getRealDisplayHeight(activity);
+        if (realHeight > usableHeight)
+            return realHeight - usableHeight;
+        return 0;
     }
 }

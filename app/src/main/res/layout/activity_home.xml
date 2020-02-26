@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_home_main_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:hardwareAccelerated="true"
     tools:context=".UI.HomeActivity">
 
 
@@ -13,7 +15,8 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".UI.HomeActivity" />
+        tools:context=".UI.HomeActivity"
+        android:hardwareAccelerated="true"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/more_options_act_home"
@@ -75,8 +78,9 @@
 
     <RelativeLayout
         android:id="@+id/planning_tab"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
         android:orientation="vertical">
         <Button
             android:id="@+id/planning_tab_drag_view"
@@ -86,16 +90,26 @@
             android:layout_centerHorizontal="true"/>
 
         <androidx.appcompat.widget.SearchView
-            android:id="@+id/planning_tab_search_bar"
+            android:id="@+id/planning_tab_search_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/planning_tab_drag_view"/>
+            app:iconifiedByDefault="false"
+            android:layout_below="@id/planning_tab_drag_view" />
 
         <Button
             android:id="@+id/planning_tab_find_nearby_stops"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/planning_tab_search_bar"
+            android:layout_below="@id/planning_tab_search_view"
             android:background="@drawable/button_background" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/planning_tab_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/planning_tab_find_nearby_stops"/>
+
     </RelativeLayout>
+
+
 </RelativeLayout>

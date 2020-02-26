@@ -2,26 +2,26 @@ package com.greymatter.snowline.UI;
 
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Rect;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
-import android.widget.Toolbar;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.FragmentActivity;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -30,30 +30,33 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.greymatter.snowline.Data.Constants;
 import com.greymatter.snowline.Handlers.HomeActivityHelper;
-import com.greymatter.snowline.Handlers.LinkGenerator;
+import com.greymatter.snowline.Handlers.KeyboardVisibilityListener;
 import com.greymatter.snowline.Handlers.MapHandler;
-import com.greymatter.snowline.Objects.Route;
 import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.R;
 import java.util.ArrayList;
+
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_MOVE;
+import static android.view.MotionEvent.ACTION_UP;
+import static com.greymatter.snowline.Data.Constants.*;
 
 public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener,
         OnMapReadyCallback{
     private FloatingActionButton moreOptionsButton;
     private View.OnClickListener homeScreenClicksListener;
+    private View.OnTouchListener onTouchListener;
     private PopupMenu optionsMenu;
     private SupportMapFragment mapFragment;
-    private FusedLocationProviderClient fusedLocationClient;
-    private LinkGenerator linkGenerator;
     private ArrayList<Stop> nearbyStops;
     private MapHandler mapHandler;
     private LinearLayout sliderLayout;
-    private Button sliderUp, sliderDown, sliderValue;
-    private RelativeLayout planningTab;
+    private Button sliderUp, sliderDown, sliderValue, planningTabDragger;
+
+    private PlanningTab planningTab;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,35 +66,21 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         sliderDown = findViewById(R.id.slider_down);
         sliderUp = findViewById(R.id.slider_up);
         sliderValue = findViewById(R.id.slider_current_value);
-        planningTab = findViewById(R.id.planning_tab);
+
+        planningTab = new PlanningTab(this, (RelativeLayout)findViewById(R.id.planning_tab));
+
         sliderValue.setText("500");
 
-        linkGenerator = new LinkGenerator();
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView);
         mapFragment.onCreate(savedInstanceState);
         mapFragment.getMapAsync(this);
+
+        setUpOnTouchEventListener();
+
         mapHandler = new MapHandler(HomeActivity.this, HomeActivity.this, mapFragment);
-
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            mapHandler.fusedLocationClientOnSuccess(location);
-                            Log.v("HOME ACTIVITY", mapHandler.getLastKnownLocation().toString());
-                            if(mapHandler.getCurrentMap()!=null){
-                                mapHandler.getCurrentMap().
-                                        animateCamera(CameraUpdateFactory.newLatLngZoom(mapHandler.getLastKnownLatLng(),15));
-
-                            }
-                        }
-                    }
-                });
+        mapHandler.fusedLocationClientListener();
         setUpUIElements();
-        setUpPlanningTab();
     }
 
     @Override
@@ -102,26 +91,10 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     private void setUpUIElements(){
         setUpOptionsMenu();
         setUpButtonListener();
+        HomeActivityHelper.setKeyboardVisibilityListener(HomeActivity.this, planningTab);
     }
 
-    private void setUpPlanningTab(){
-        planningTab.setVisibility(View.VISIBLE);
-        ObjectAnimator animation = ObjectAnimator.ofFloat(planningTab, "translationY",
-                Constants.getDisplayHeight(this)-150);
-        animation.setDuration(1);
-        animation.start();
 
-        Button button = planningTab.findViewById(R.id.planning_tab_drag_view);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ObjectAnimator animation = ObjectAnimator.ofFloat(planningTab, "translationY",
-                        Constants.getDisplayHeight(HomeActivity.this)-600);
-                animation.setDuration(200);
-                animation.start();
-            }
-        });
-    }
 
     private void setUpButtonListener(){
         homeScreenClicksListener = new View.OnClickListener() {
@@ -168,7 +141,6 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                                 animation.setDuration(500);
                                 animation.start();
                             }
-
                             findNearbyStops(Integer.parseInt(sliderValue.getText().toString()));
 
                             mapHandler.getCurrentMap().
@@ -202,70 +174,15 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         mapHandler.getCurrentMap().setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                AlertDialog stopInfoDialog = generateDigitalStopSign((Stop)marker.getTag(),HomeActivityHelper.getRoutes(((Stop)marker.getTag())));
+                AlertDialog stopInfoDialog = HomeActivityHelper.generateStopDialog(
+                        (Stop)marker.getTag(),HomeActivity.this,
+                        HomeActivityHelper.getRoutes(((Stop)marker.getTag())));
 
                 stopInfoDialog.show();
 
                 return false;
             }
         });
-    }
-
-    public AlertDialog generateDigitalStopSign(final Stop stop, ArrayList<Route> stopRoutes) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
-        View view = HomeActivity.this.getLayoutInflater().inflate(R.layout.digital_stop_sign,null);
-
-        LinearLayout mainRoutesLayout = view.findViewById(R.id.digital_all_routes_linear_layout);
-
-        Toolbar toolbar = view.findViewById(R.id.digital_toolbar);
-        toolbar.setTitle(stop.getName());
-
-        Button stopNumber = view.findViewById(R.id.digital_stop_number);
-        stopNumber.setText(stop.getNumber());
-
-        LinearLayout subRoutesLayout = new LinearLayout(HomeActivity.this);
-        subRoutesLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        subRoutesLayout.setOrientation(LinearLayout.HORIZONTAL);
-        mainRoutesLayout.addView(subRoutesLayout);
-
-        for(int i=0;i<stopRoutes.size();i++) {
-            Route r = stopRoutes.get(i);
-            Button b = new Button(HomeActivity.this);
-            b.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
-            b.setBackgroundResource(R.drawable.arrow_button_background);
-
-            b.setText(r.getNumber());
-            if(subRoutesLayout.getChildCount()<4){
-                subRoutesLayout.addView(b);
-            }else{
-                subRoutesLayout = new LinearLayout(HomeActivity.this);
-                subRoutesLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT));
-                subRoutesLayout.setOrientation(LinearLayout.HORIZONTAL);
-                mainRoutesLayout.addView(subRoutesLayout);
-                subRoutesLayout.addView(b);
-            }
-
-        }
-
-        stopNumber.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this,StopScheduleActivity.class);
-                intent.putExtra("stop_number", stop.getNumber());
-                startActivity(intent);
-            }
-        });
-        builder.setView(view);
-
-        AlertDialog toReturn = builder.create();
-        toReturn.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        return toReturn;
     }
 
     @Override
@@ -328,4 +245,35 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
     }
 
+
+
+    private void setUpOnTouchEventListener(){
+        onTouchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int x = (int)event.getRawX();
+                int y = (int)event.getRawY();
+
+                switch (event.getAction()){
+
+                    case ACTION_DOWN:
+                        switch (v.getId()){
+                        }
+
+                        break;
+                    case ACTION_MOVE:
+                        switch (v.getId()){
+                        }
+                        break;
+                    case ACTION_UP:
+                        switch (v.getId()){
+
+                        }
+                        break;
+                }
+
+                return false;
+            }
+        };
+    }
 }

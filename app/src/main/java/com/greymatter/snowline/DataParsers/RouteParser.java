@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import static com.greymatter.snowline.Data.Constants.*;
 
 public class RouteParser {
-    public static Route parseRouteInfo(JSONObject object){
+    public static Route parse(JSONObject object){
         Route route = new Route();
         try {
             route.setName(object.getString(NAME));

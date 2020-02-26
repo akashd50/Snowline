@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 public class CentreParser extends JSONParser {
 
-    public static Centre parseCenterInfo(JSONObject object){
+    public static Centre parse(JSONObject object){
         Centre centre = new Centre();
         try {
             centre = utmInfo(centre, object.getJSONObject(UTM));
