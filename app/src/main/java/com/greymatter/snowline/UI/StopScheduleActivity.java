@@ -13,8 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.greymatter.snowline.Adapters.ScheduleListRAdapter;
-import com.greymatter.snowline.Data.Constants;
-import com.greymatter.snowline.DataParsers.JSONParser;
+import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.DataParsers.StopScheduleParser;
 import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.R;
@@ -28,7 +27,7 @@ import org.json.JSONObject;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static com.greymatter.snowline.Data.Constants.STOP_SCHEDULE;
+import static com.greymatter.snowline.app.Constants.STOP_SCHEDULE;
 
 public class StopScheduleActivity extends AppCompatActivity {
     private final String TAG = "StopScheduleActivity: ";

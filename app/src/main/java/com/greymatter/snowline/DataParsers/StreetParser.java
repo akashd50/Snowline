@@ -1,7 +1,7 @@
 package com.greymatter.snowline.DataParsers;
 
 import com.greymatter.snowline.Objects.Street;
-import static com.greymatter.snowline.Data.Constants.*;
+import static com.greymatter.snowline.app.Constants.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;

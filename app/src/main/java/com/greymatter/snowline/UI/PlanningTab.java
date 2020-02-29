@@ -2,33 +2,47 @@ package com.greymatter.snowline.UI;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Context;
-import android.util.AttributeSet;
+import android.database.Cursor;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
+import androidx.cursoradapter.widget.CursorAdapter;
+import androidx.cursoradapter.widget.SimpleCursorAdapter;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
-import static com.greymatter.snowline.Data.Constants.*;
+import static com.greymatter.snowline.app.Constants.*;
 
 import com.greymatter.snowline.Adapters.ScheduleListRAdapter;
-import com.greymatter.snowline.Data.Constants;
+import com.greymatter.snowline.Adapters.SearchViewAdapter;
+import com.greymatter.snowline.Data.database.LocalDatabase;
+import com.greymatter.snowline.Data.database.StopDBHelper;
+import com.greymatter.snowline.Data.entities.StopEntity;
+import com.greymatter.snowline.Handlers.OnActionListener;
+import com.greymatter.snowline.Objects.Stop;
+import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.Handlers.HomeActivityHelper;
 import com.greymatter.snowline.Handlers.KeyboardVisibilityListener;
 import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.Handlers.Validator;
-import com.greymatter.snowline.Objects.RouteVariant;
 import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.Objects.Vector;
 import com.greymatter.snowline.R;
+import com.greymatter.snowline.app.Services;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,23 +56,28 @@ public class PlanningTab implements KeyboardVisibilityListener {
     private boolean searchBarHasFocus;
     private Vector translationDelta, locationBeforeAnim;
     private View.OnTouchListener onTouchListener;
-
     private LinkGenerator linkGenerator;
     private RecyclerView recyclerView;
     private ScheduleListRAdapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
+    private StopDBHelper stopDBHelper;
+    private SearchViewAdapter searchViewAdapter;
+    private OnActionListener onDBQueryFinished;
 
-    public PlanningTab(Context context, RelativeLayout planningTab){
+    public PlanningTab(final Context context, RelativeLayout planningTab){
         this.context = context;
         this.parentActivity = (Activity)context;
         this.mainLayout = planningTab;
         this.searchView = mainLayout.findViewById(R.id.planning_tab_search_view);
         this.dragView = mainLayout.findViewById(R.id.planning_tab_drag_view);
         searchBarHasFocus = false;
+        stopDBHelper = new StopDBHelper(Services.getDatabase(context));
 
         init();
         initRecyclerView();
         initSearchListeners();
+        initSearchAdapters();
+        initDBListeners();
     }
 
     private void init(){
@@ -84,6 +103,14 @@ public class PlanningTab implements KeyboardVisibilityListener {
             public boolean onQueryTextSubmit(String query) {
                 Log.v(PLANNING_TAB, "OnQueryTextSubmit callback");
                 if(Validator.validateStopNumber(query)) {
+
+                    Log.v("Logging DB Entries","------------------------------");
+
+                    ArrayList<StopEntity> allStops = stopDBHelper.getAllStops();
+                    for(StopEntity stopEntity:allStops){
+                        Log.v(PLANNING_TAB,stopEntity.stopName);
+                    }
+
                     linkGenerator = new LinkGenerator();
                     linkGenerator.generateStopScheduleLink(query).apiKey()
                             .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
@@ -92,6 +119,19 @@ public class PlanningTab implements KeyboardVisibilityListener {
                     if(stopSchedule!=null) {
                         mAdapter.updateLocalList(stopSchedule.getRoutes());
                         mAdapter.notifyDataSetChanged();
+                    }
+
+                    Stop stop = stopSchedule.getStop();
+
+                    final StopEntity stopEntity = new StopEntity();
+                    if(stop!=null) {
+                        stopEntity.key = Integer.parseInt(stop.getNumber());
+                        stopEntity.stopName = stop.getName();
+                        stopEntity.stopNumber = stop.getNumber();
+                        stopEntity.direction = stop.getDirection();
+                    }
+                    if(!stopDBHelper.exists(query)){
+                        stopDBHelper.addStop(stopEntity);
                     }
                 }
                 if (searchBarHasFocus) {
@@ -110,6 +150,8 @@ public class PlanningTab implements KeyboardVisibilityListener {
                     searchBarHasFocus = true;
                     animateLayout(300, 0);
                 }
+
+                stopDBHelper.getSimilar(newText, onDBQueryFinished);
 
                 return false;
             }
@@ -138,6 +180,37 @@ public class PlanningTab implements KeyboardVisibilityListener {
                 }
             }
         });
+    }
+
+    private void initSearchAdapters(){
+        final SearchManager searchManager = (SearchManager)context.getSystemService(Context.SEARCH_SERVICE);
+        //searchView.setSearchableInfo(searchManager.getSearchableInfo(((Activity) context).getComponentName()));
+        searchViewAdapter = new SearchViewAdapter(context, null, false);
+        searchView.setSuggestionsAdapter(searchViewAdapter);
+    }
+
+    private void initDBListeners(){
+        final Handler handler = new Handler(Looper.myLooper()){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                Cursor cursor = (Cursor)msg.obj;
+                if(cursor.getCount()>0) {
+                    cursor.moveToNext();
+                    Log.v("Cursor: ", "" + cursor.getInt(0));
+                    searchViewAdapter.swapCursor(cursor);
+                }else{
+                    searchViewAdapter.swapCursor(null);
+                }
+            }
+        };
+
+        onDBQueryFinished = new OnActionListener() {
+            @Override
+            public void onAction(Object object) {
+                Message completeMessage = handler.obtainMessage(0, object);
+                completeMessage.sendToTarget();
+            }
+        };
     }
 
     private void initRecyclerView(){

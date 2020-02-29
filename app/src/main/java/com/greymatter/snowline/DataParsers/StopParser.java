@@ -4,7 +4,7 @@ import com.greymatter.snowline.Objects.Stop;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.greymatter.snowline.Data.Constants.*;
+import static com.greymatter.snowline.app.Constants.*;
 
 public class StopParser extends JSONParser {
 

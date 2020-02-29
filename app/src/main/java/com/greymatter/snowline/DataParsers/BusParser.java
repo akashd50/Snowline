@@ -3,7 +3,7 @@ package com.greymatter.snowline.DataParsers;
 import com.greymatter.snowline.Objects.Bus;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.greymatter.snowline.Data.Constants.*;
+import static com.greymatter.snowline.app.Constants.*;
 
 public class BusParser extends JSONObject {
     public static Bus parse(JSONObject object){

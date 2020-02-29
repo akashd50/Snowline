@@ -1,6 +1,5 @@
 package com.greymatter.snowline.Handlers;
 
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -11,14 +10,12 @@ import android.location.Location;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toolbar;
 
-import com.greymatter.snowline.Data.Constants;
+import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.DataParsers.RouteParser;
 import com.greymatter.snowline.DataParsers.StopParser;
 import com.greymatter.snowline.DataParsers.StopScheduleParser;
@@ -32,11 +29,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static com.greymatter.snowline.Data.Constants.HOME_ACTIVITY_HELPER;
-import static com.greymatter.snowline.Data.Constants.STOP_SCHEDULE;
+import static com.greymatter.snowline.app.Constants.HOME_ACTIVITY_HELPER;
+import static com.greymatter.snowline.app.Constants.STOP_SCHEDULE;
 
 public class HomeActivityHelper {
 

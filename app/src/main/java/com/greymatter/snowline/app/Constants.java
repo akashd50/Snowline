@@ -1,7 +1,6 @@
-package com.greymatter.snowline.Data;
+package com.greymatter.snowline.app;
 
 import android.app.Activity;
-import android.content.Context;
 import android.util.DisplayMetrics;
 
 public class Constants {
@@ -50,6 +49,20 @@ public class Constants {
     public static final String BUS = "bus";
     public static final String BIKE_RACK = "bike-rack";
     public static final String WIFI = "wifi";
+
+    //DB Constants
+    public static final String DB_ID = "_id";
+    public static final String DB_STOP_TABLE = "stops_table";
+    public static final String DB_STREET_TABLE = "street_table";
+    public static final String DB_CENTER_TABLE = "center_table";
+
+    public static final String DB_STOP_NUMBER = "stop_number";
+    public static final String DB_STOP_NAME = "stop_name";
+    public static final String DB_STOP_DIRECTION = "stop_direction";
+    public static final String DB_STOP_STREET = "stop_street";
+    public static final String DB_STOP_CROSS_STREET = "stop_cross-street";
+    public static final String DB_STREET_NAME = "street_name";
+    public static final String DB_STREET_TYPE = "street_type";
 
     public static int getDisplayHeight(Activity activity){
         DisplayMetrics displayMetrics = new DisplayMetrics();
