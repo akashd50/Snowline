@@ -3,15 +3,16 @@ package com.greymatter.snowline.Data.entities;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
-import static com.greymatter.snowline.app.Constants.DB_ID;
-import static com.greymatter.snowline.app.Constants.DB_STOP_TABLE;
-import static com.greymatter.snowline.app.Constants.DB_STREET_NAME;
-import static com.greymatter.snowline.app.Constants.DB_STREET_TABLE;
-import static com.greymatter.snowline.app.Constants.DB_STREET_TYPE;
+import static com.greymatter.snowline.app.Constants.*;
 
 @Entity(tableName = DB_STREET_TABLE)
 public class StreetEntity {
+    @PrimaryKey @ColumnInfo(name = DB_ID)
+    public int id;
+
+    @ColumnInfo(name = KEY)
+    public int key;
+
     @ColumnInfo(name = DB_STREET_NAME)
     public String streetName;
 

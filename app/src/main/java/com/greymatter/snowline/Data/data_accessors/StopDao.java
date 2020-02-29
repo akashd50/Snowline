@@ -12,7 +12,10 @@ import java.util.List;
 @Dao
 public interface StopDao {
     @Query("SELECT * FROM STOPS_TABLE")
-    List<StopEntity> getAll();
+    List<StopEntity> getAllToList();
+
+    @Query("SELECT * FROM STOPS_TABLE")
+    Cursor getAllToCursor();
 
     @Query("SELECT * FROM STOPS_TABLE WHERE stop_number = :number LIMIT 1")
     StopEntity get(String number);

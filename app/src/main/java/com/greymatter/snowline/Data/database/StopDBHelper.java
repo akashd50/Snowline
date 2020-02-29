@@ -1,13 +1,12 @@
 package com.greymatter.snowline.Data.database;
 
-import android.database.Cursor;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.greymatter.snowline.Data.entities.StopEntity;
-import com.greymatter.snowline.Handlers.OnActionListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class StopDBHelper {
     private LocalDatabase database;
@@ -63,12 +62,14 @@ public class StopDBHelper {
         return true;
     }
 
-    public void getSimilar(final String toFind, final OnActionListener listener){
+    public void getSimilar(final String toFind, final Handler handler){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 Log.v("StopDBHelper#getSimilar()", "Running");
-                listener.onAction(database.stopDao().getSimilar(toFind));
+                Message completeMessage = handler.obtainMessage(0, database.stopDao().getSimilar(toFind));
+                completeMessage.sendToTarget();
+
             }
         }).start();
     }
@@ -80,7 +81,7 @@ public class StopDBHelper {
             @Override
             public void run() {
                 synchronized (lock) {
-                    toReturn.addAll(database.stopDao().getAll());
+                    toReturn.addAll(database.stopDao().getAllToList());
                     lock.notifyAll();
                 }
             }

@@ -62,8 +62,8 @@ public class PlanningTab implements KeyboardVisibilityListener {
     private RecyclerView.LayoutManager layoutManager;
     private StopDBHelper stopDBHelper;
     private SearchViewAdapter searchViewAdapter;
-    private OnActionListener onDBQueryFinished;
-
+    //private OnActionListener onDBQueryFinished;
+    private Handler dbQueryHandler;
     public PlanningTab(final Context context, RelativeLayout planningTab){
         this.context = context;
         this.parentActivity = (Activity)context;
@@ -151,7 +151,7 @@ public class PlanningTab implements KeyboardVisibilityListener {
                     animateLayout(300, 0);
                 }
 
-                stopDBHelper.getSimilar(newText, onDBQueryFinished);
+                stopDBHelper.getSimilar(newText, dbQueryHandler);
 
                 return false;
             }
@@ -190,7 +190,7 @@ public class PlanningTab implements KeyboardVisibilityListener {
     }
 
     private void initDBListeners(){
-        final Handler handler = new Handler(Looper.myLooper()){
+        dbQueryHandler = new Handler(Looper.myLooper()){
             @Override
             public void handleMessage(@NonNull Message msg) {
                 Cursor cursor = (Cursor)msg.obj;
@@ -204,13 +204,13 @@ public class PlanningTab implements KeyboardVisibilityListener {
             }
         };
 
-        onDBQueryFinished = new OnActionListener() {
-            @Override
-            public void onAction(Object object) {
-                Message completeMessage = handler.obtainMessage(0, object);
-                completeMessage.sendToTarget();
-            }
-        };
+//        dbQueryHandler = new OnActionListener() {
+//            @Override
+//            public void onAction(Object object) {
+//                Message completeMessage = handler.obtainMessage(0, object);
+//                completeMessage.sendToTarget();
+//            }
+//        };
     }
 
     private void initRecyclerView(){
