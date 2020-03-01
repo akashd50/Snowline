@@ -20,6 +20,9 @@ public interface StopDao {
     @Query("SELECT * FROM STOPS_TABLE WHERE stop_number = :number LIMIT 1")
     StopEntity get(String number);
 
+    @Query("SELECT * FROM STOPS_TABLE WHERE _id = :id LIMIT 1")
+    StopEntity get(int id);
+
     @Query("SELECT * FROM STOPS_TABLE WHERE stop_number LIKE :number+'%'")
     Cursor getSimilar(String number);
 

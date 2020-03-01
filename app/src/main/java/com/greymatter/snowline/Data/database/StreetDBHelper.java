@@ -2,32 +2,23 @@ package com.greymatter.snowline.Data.database;
 
 import android.database.Cursor;
 import android.os.Handler;
-
-import com.greymatter.snowline.Data.entities.AppDataEntity;
-import com.greymatter.snowline.Data.entities.StopEntity;
-import com.greymatter.snowline.app.Services;
-
+import com.greymatter.snowline.Data.entities.StreetEntity;
 import java.util.ArrayList;
-
-import static com.greymatter.snowline.app.Constants.DEFAULT_USER;
 import static com.greymatter.snowline.app.Constants.FAIL;
 import static com.greymatter.snowline.app.Constants.SUCCESS;
 
-public class StopDBHelper {
+public class StreetDBHelper {
     private LocalDatabase database;
-    public StopDBHelper(LocalDatabase dbref){
+    public StreetDBHelper(LocalDatabase dbref){
         database = dbref;
     }
-
-    public void addStop(final StopEntity stopEntity, final Handler handler){
+    
+    public void addNew(final StreetEntity streetEntity, final Handler handler){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try{
-                    int nextId = Services.getAppDataDBHelper().getNextID(DEFAULT_USER);
-                    stopEntity.id = nextId;
-
-                    database.stopDao().insertAll(stopEntity);
+                    database.streetDao().insertAll(streetEntity);
                     handler.obtainMessage(SUCCESS).sendToTarget();
                 }catch (Exception e){
                     handler.obtainMessage(FAIL).sendToTarget();
@@ -35,15 +26,15 @@ public class StopDBHelper {
             }
         }).start();
     }
-
-    public void addStop(final StopEntity stopEntity){
+    
+    public void addStop(final StreetEntity streetEntity){
         final Object lock = new Object();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 synchronized (lock) {
-                    database.stopDao().insertAll(stopEntity);
+                    database.streetDao().insertAll(streetEntity);
                     lock.notifyAll();
                 }
             }
@@ -62,9 +53,9 @@ public class StopDBHelper {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                StopEntity stopEntity = database.stopDao().get(toFind);;
-                if(stopEntity!=null) handler.obtainMessage(SUCCESS, stopEntity).sendToTarget();
-                else  handler.obtainMessage(FAIL, stopEntity).sendToTarget();
+                StreetEntity streetEntity = database.streetDao().get(toFind);;
+                if(streetEntity!=null) handler.obtainMessage(SUCCESS, streetEntity).sendToTarget();
+                else  handler.obtainMessage(FAIL, streetEntity).sendToTarget();
             }
         }).start();
     }
@@ -72,12 +63,12 @@ public class StopDBHelper {
     public boolean find(final String toFind){
         final Object lock = new Object();
 
-        final StopEntity[] toReturn = new StopEntity[1];
+        final StreetEntity[] toReturn = new StreetEntity[1];
         new Thread(new Runnable() {
             @Override
             public void run() {
                 synchronized (lock) {
-                    toReturn[0] = database.stopDao().get(toFind);
+                    toReturn[0] = database.streetDao().get(toFind);
                     lock.notifyAll();
                 }
             }
@@ -95,36 +86,25 @@ public class StopDBHelper {
         return true;
     }
 
-    public void getSimilar(final String toFind, final Handler handler){
+    public void getAllStreets(final Handler handler){
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Cursor cursor = database.stopDao().getSimilar(toFind);
-                if(cursor!=null) handler.obtainMessage(SUCCESS,cursor).sendToTarget();
-                else handler.obtainMessage(FAIL, cursor).sendToTarget();
-            }
-        }).start();
-    }
-
-    public void getAllStops(final Handler handler){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList toReturn = (ArrayList)database.stopDao().getAllToList();
+                ArrayList toReturn = (ArrayList)database.streetDao().getAllToList();
                 if(toReturn!=null) handler.obtainMessage(SUCCESS, toReturn).sendToTarget();
                 else handler.obtainMessage(FAIL, toReturn).sendToTarget();
             }
         }).start();
     }
 
-    public ArrayList<StopEntity> getAllStops(){
+    public ArrayList<StreetEntity> getAllStreets(){
         final Object lock = new Object();
-        final ArrayList<StopEntity> toReturn = new ArrayList<>();
+        final ArrayList<StreetEntity> toReturn = new ArrayList<>();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 synchronized (lock) {
-                    toReturn.addAll(database.stopDao().getAllToList());
+                    toReturn.addAll(database.streetDao().getAllToList());
                     lock.notifyAll();
                 }
             }

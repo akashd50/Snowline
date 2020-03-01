@@ -16,9 +16,6 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
-import androidx.cursoradapter.widget.CursorAdapter;
-import androidx.cursoradapter.widget.SimpleCursorAdapter;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,10 +26,8 @@ import static com.greymatter.snowline.app.Constants.*;
 
 import com.greymatter.snowline.Adapters.ScheduleListRAdapter;
 import com.greymatter.snowline.Adapters.SearchViewAdapter;
-import com.greymatter.snowline.Data.database.LocalDatabase;
 import com.greymatter.snowline.Data.database.StopDBHelper;
 import com.greymatter.snowline.Data.entities.StopEntity;
-import com.greymatter.snowline.Handlers.OnActionListener;
 import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.Handlers.HomeActivityHelper;
@@ -130,7 +125,7 @@ public class PlanningTab implements KeyboardVisibilityListener {
                         stopEntity.stopNumber = stop.getNumber();
                         stopEntity.direction = stop.getDirection();
                     }
-                    if(!stopDBHelper.exists(query)){
+                    if(!stopDBHelper.find(query)){
                         stopDBHelper.addStop(stopEntity);
                     }
                 }

@@ -10,6 +10,9 @@ public class CenterEntity {
     @PrimaryKey @ColumnInfo(name = DB_ID)
     public int id;
 
+    @ColumnInfo(name = DB_STOP_NUMBER)
+    public int stopNumber;
+
     @ColumnInfo(name = DB_ZONE)
     public int zone;
 

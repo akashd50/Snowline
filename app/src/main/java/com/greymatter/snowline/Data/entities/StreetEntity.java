@@ -13,6 +13,9 @@ public class StreetEntity {
     @ColumnInfo(name = KEY)
     public int key;
 
+    @ColumnInfo(name = DB_STOP_NUMBER)
+    public int stopNumber;
+
     @ColumnInfo(name = DB_STREET_NAME)
     public String streetName;
 
