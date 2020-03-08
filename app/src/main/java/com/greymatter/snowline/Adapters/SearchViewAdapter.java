@@ -31,6 +31,15 @@ public class SearchViewAdapter extends CursorAdapter {
         isDirty = true;
     }
 
+    public String getSuggestionText(int position){
+        if(localAdapterInstance!=null){
+            localAdapterInstance.moveToPosition(position);
+            String stopNumber = localAdapterInstance.getString(localAdapterInstance.getColumnIndexOrThrow(Constants.DB_STOP_NUMBER));
+            return stopNumber;
+        }
+        return null;
+    }
+
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         if(isDirty){
@@ -56,5 +65,11 @@ public class SearchViewAdapter extends CursorAdapter {
             TextView t1 = (TextView) view;
             t1.setText(stopNumber);
         }
+    }
+
+    @Override
+    public Cursor swapCursor(Cursor newCursor) {
+        localAdapterInstance = newCursor;
+        return super.swapCursor(newCursor);
     }
 }

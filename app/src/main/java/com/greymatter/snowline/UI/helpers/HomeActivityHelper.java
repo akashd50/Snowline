@@ -1,4 +1,4 @@
-package com.greymatter.snowline.Handlers;
+package com.greymatter.snowline.UI.helpers;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,6 +15,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toolbar;
 
+import com.greymatter.snowline.Handlers.KeyboardVisibilityListener;
+import com.greymatter.snowline.Handlers.LinkGenerator;
+import com.greymatter.snowline.Handlers.RequestHandler;
 import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.DataParsers.RouteParser;
 import com.greymatter.snowline.DataParsers.StopParser;
@@ -36,56 +39,7 @@ import static com.greymatter.snowline.app.Constants.STOP_SCHEDULE;
 
 public class HomeActivityHelper {
 
-//    public static void setUpPlanningTab(final Activity activity, final RelativeLayout planningTab){
-//        planningTab.setVisibility(View.VISIBLE);
-//        ObjectAnimator animation = ObjectAnimator.ofFloat(planningTab, "translationY",
-//                Constants.getDisplayHeight(activity)-100);
-//        animation.setDuration(1);
-//        animation.start();
-//
-//        Button button = planningTab.findViewById(R.id.planning_tab_drag_view);
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                ObjectAnimator animation = ObjectAnimator.ofFloat(planningTab, "translationY",
-//                        Constants.getDisplayHeight(activity)-((float)planningTab.getHeight())-100);
-//                Log.v(Constants.HOME_ACTIVITY, ""+planningTab.getHeight());
-//                animation.setDuration(200);
-//                animation.start();
-//
-//                ViewGroup.LayoutParams params = planningTab.getLayoutParams();
-//                Log.v(Constants.HOME_ACTIVITY, ""+(int)planningTab.getTranslationY());
-//
-//                params.height = (int)(Constants.getDisplayHeight(activity) - planningTab.getPivotY());
-//                planningTab.setLayoutParams(params);
-//            }
-//        });
-//    }
 
-    public static void onTouchEvent(){
-
-    }
-
-    public static ArrayList<Stop> getNearbyStops(Location location, int radius){
-        ArrayList<Stop> nearbyStops = new ArrayList<>();
-        final LinkGenerator linkGenerator = new LinkGenerator();
-        linkGenerator.generateStopLink().apiKey()
-                .latLon(location.getLatitude()+"", location.getLongitude()+"")
-                .distance(radius+"");
-
-        final StringBuilder stringBuilder = RequestHandler.makeRequest(linkGenerator);
-
-        try {
-            JSONObject result = new JSONObject(stringBuilder.toString());
-            JSONArray stopsArray = result.getJSONArray(Constants.STOPS);
-            for(int i=0; i < stopsArray.length(); i++) {
-                nearbyStops.add(StopParser.parse(stopsArray.getJSONObject(i)));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return nearbyStops;
-    }
 
     public static AlertDialog generateStopDialog(final Stop stop, final Activity activity, ArrayList<Route> stopRoutes) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
