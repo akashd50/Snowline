@@ -35,7 +35,7 @@ import com.greymatter.snowline.Handlers.MapHandler;
 import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.UI.helpers.PlanningTabUIHelper;
 import com.greymatter.snowline.app.Constants;
-import com.greymatter.snowline.UI.helpers.HomeActivityHelper;
+import com.greymatter.snowline.UI.helpers.HomeActivityUIHelper;
 import com.greymatter.snowline.Handlers.KeyboardVisibilityListener;
 import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.Handlers.Validator;
@@ -277,24 +277,18 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     public boolean onTouch(View v, MotionEvent event) {
         int x = (int)event.getRawX();
         int y = (int)event.getRawY();
+
         boolean eventHandled = false;
         switch (event.getAction()){
             case ACTION_DOWN:
                 Log.v(PLANNING_TAB, "Planning Tab Click Detected!");
                 switch (v.getId()){
-                    case R.id.planning_tab_drag_view:
-                        RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams)
-                                mainLayout.getLayoutParams();
-
+                    case R.id.planning_tab: case R.id.planning_tab_drag_view:
                         translationDelta.x = x - (int)mainLayout.getTranslationX();
                         translationDelta.y = y - (int)mainLayout.getTranslationY();
                         return true;
                     case R.id.planning_tab_search_view:
                         Log.v(PLANNING_TAB, "Planning Tab Search bar touch down Detected!");
-                        return true;
-
-                    case R.id.planning_tab:
-
                         return true;
                 }
 
@@ -303,17 +297,8 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
                 Log.v(PLANNING_TAB, "Planning Tab Click Move Detected!");
 
                 switch (v.getId()){
-                    case R.id.planning_tab_drag_view:
-                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
-                                mainLayout.getLayoutParams();
-
-                        mainLayout.setTranslationY(y-translationDelta.y);
-                        layoutParams.height = Constants.getDisplayHeight(parentActivity) - (y-translationDelta.y);
-                        mainLayout.setLayoutParams(layoutParams);
-                        return true;
-
-                    case R.id.planning_tab:
-
+                    case R.id.planning_tab: case R.id.planning_tab_drag_view:
+                        translateMainLayoutTo(x,y,translationDelta.x, translationDelta.y);
                         return true;
                 }
                 break;
@@ -322,12 +307,7 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
 
                 switch (v.getId()){
                     case R.id.planning_tab_drag_view:
-                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
-                                mainLayout.getLayoutParams();
-
-                        mainLayout.setTranslationY(y-translationDelta.y);
-                        layoutParams.height = Constants.getDisplayHeight(parentActivity) - (y-translationDelta.y);
-                        mainLayout.setLayoutParams(layoutParams);
+                        translateMainLayoutTo(x,y,translationDelta.x, translationDelta.y);
                         return true;
 
                     case R.id.planning_tab_search_view:
@@ -342,6 +322,25 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         }
         mainLayout.invalidate();
         return false;
+    }
+
+    public void translateMainLayoutTo(int x, int y, int dx, int dy) {
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
+                mainLayout.getLayoutParams();
+
+      //  if(mainLayout.getTranslationY() < 100 || mainLayout.getTranslationY() > getDisplayHeight(parentActivity)-100) return;
+        if(y-dy < 5 || y-dy > getDisplayHeight(parentActivity)-100) return;
+
+        mainLayout.setTranslationY(y-dy);
+
+        Log.v(PLANNING_TAB, "Relative Layout translation Y: " + mainLayout.getTranslationY());
+        Log.v(PLANNING_TAB, "Relative Layout display height: " + Constants.getDisplayHeight(parentActivity));
+
+        layoutParams.height = (int) (Constants.getDisplayHeight(parentActivity) - (mainLayout.getTranslationY()));
+
+        Log.v(PLANNING_TAB, "Relative Layout height: " + layoutParams.height);
+
+        mainLayout.setLayoutParams(layoutParams);
     }
 
     public void displayNearbyStops(int distance) {
@@ -371,7 +370,7 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         linkGenerator.generateStopScheduleLink(stopNumber).apiKey()
                 .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
 
-        StopSchedule stopSchedule = HomeActivityHelper.fetchStopSchedule(linkGenerator);
+        StopSchedule stopSchedule = HomeActivityUIHelper.fetchStopSchedule(linkGenerator);
         if(stopSchedule!=null) {
             scheduleListAdapter.updateLocalList(stopSchedule.getRoutes());
             scheduleListAdapter.notifyDataSetChanged();

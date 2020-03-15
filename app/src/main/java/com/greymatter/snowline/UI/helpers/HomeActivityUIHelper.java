@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import static com.greymatter.snowline.app.Constants.HOME_ACTIVITY_HELPER;
 import static com.greymatter.snowline.app.Constants.STOP_SCHEDULE;
 
-public class HomeActivityHelper {
+public class HomeActivityUIHelper {
 
 
 

@@ -12,7 +12,7 @@ import androidx.fragment.app.FragmentActivity;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.greymatter.snowline.UI.helpers.HomeActivityHelper;
+import com.greymatter.snowline.UI.helpers.HomeActivityUIHelper;
 import com.greymatter.snowline.Handlers.MapHandler;
 import com.greymatter.snowline.R;
 
@@ -20,8 +20,7 @@ import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
 
-public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener,
-        OnMapReadyCallback{
+public class HomeActivity extends FragmentActivity{
     private View.OnTouchListener onTouchListener;
     private SupportMapFragment mapFragment;
     private MapHandler mapHandler;
@@ -30,19 +29,18 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView);
         mapFragment.onCreate(savedInstanceState);
-        mapFragment.getMapAsync(this);
-
-        setUpOnTouchEventListener();
 
         mapHandler = new MapHandler(HomeActivity.this, HomeActivity.this, mapFragment);
-        mapHandler.fusedLocationClientListener();
         planningTab = new PlanningTab(this, (RelativeLayout)findViewById(R.id.planning_tab), mapHandler);
 
+        mapFragment.getMapAsync(mapHandler);
+        mapHandler.fusedLocationClientListener();
+
         setUpUIElements();
+        setUpOnTouchEventListener();
     }
 
     @Override
@@ -51,7 +49,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     }
 
     private void setUpUIElements(){
-        HomeActivityHelper.setKeyboardVisibilityListener(HomeActivity.this, planningTab);
+        HomeActivityUIHelper.setKeyboardVisibilityListener(HomeActivity.this, planningTab);
     }
 
 
@@ -96,24 +94,6 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         mapFragment.onLowMemory();
         super.onLowMemory();
     }
-
-    @Override
-    public void onMyLocationClick(@NonNull Location location) {
-
-    }
-
-    @Override
-    public boolean onMyLocationButtonClick() {
-        return false;
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mapHandler.onMapReady(googleMap);
-        // draw the sample route here
-    }
-
-
 
     private void setUpOnTouchEventListener(){
         onTouchListener = new View.OnTouchListener() {
