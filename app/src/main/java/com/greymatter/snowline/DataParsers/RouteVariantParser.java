@@ -3,16 +3,16 @@ package com.greymatter.snowline.DataParsers;
 import com.greymatter.snowline.Objects.RouteVariant;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.greymatter.snowline.Data.Constants.*;
+import static com.greymatter.snowline.app.Constants.*;
 
 public class RouteVariantParser extends JSONObject {
-    public static RouteVariant parseRouteVariantInfo(JSONObject object){
+    public static RouteVariant parse(JSONObject object){
         RouteVariant routeVariant = new RouteVariant();
         try {
             routeVariant.setKey(object.getString(KEY));
             routeVariant.setCancelled(object.getBoolean(CANCELLED));
-            routeVariant.setTimeinfo(TimeParser.parseTimesInfo(object.getJSONObject(TIMES)));
-            routeVariant.setBusInfo(BusParser.parseBusInfo(object.getJSONObject(BUS)));
+            routeVariant.setTimeinfo(TimeParser.parse(object.getJSONObject(TIMES)));
+            routeVariant.setBusInfo(BusParser.parse(object.getJSONObject(BUS)));
 
             parseVariantInfo(routeVariant, object.getJSONObject(VARIANT));
         } catch (JSONException e) {

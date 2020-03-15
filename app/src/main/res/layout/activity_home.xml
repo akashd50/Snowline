@@ -1,101 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_home_main_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:hardwareAccelerated="true"
     tools:context=".UI.HomeActivity">
-
 
     <fragment
         android:id="@+id/mapView"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".UI.HomeActivity" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/more_options_act_home"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        app:srcCompat="@android:drawable/arrow_up_float" />
-
-
-    <LinearLayout
-        android:id="@+id/slider_layout"
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:visibility="invisible"
-        android:layout_above="@id/more_options_act_home">
-
-        <Button
-            android:id="@+id/slider_up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+"
-            android:background="@drawable/arrow_button_background"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_above="@id/slider_current_value"/>
-
-        <Button
-            android:id="@+id/slider_current_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/transparent_background"
-            android:layout_centerInParent="true"/>
-
-        <Button
-            android:id="@+id/slider_down"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/arrow_button_background"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/slider_current_value"/>
-    </LinearLayout>
-
+        tools:context=".UI.HomeActivity"
+        android:hardwareAccelerated="true"/>
 
     <RelativeLayout
         android:id="@+id/planning_tab"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/color_dark_navy_blue"
         android:orientation="vertical">
         <Button
             android:id="@+id/planning_tab_drag_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_background"
+            android:layout_height="@dimen/text_large"
+            android:background="@color/colorPrimaryDark"
             android:layout_centerHorizontal="true"/>
 
         <androidx.appcompat.widget.SearchView
-            android:id="@+id/planning_tab_search_bar"
+            android:id="@+id/planning_tab_search_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/planning_tab_drag_view"/>
+            app:iconifiedByDefault="false"
+            android:background="@color/color_white"
+            android:layout_below="@id/planning_tab_drag_view" />
+
+        <Button
+            android:id="@+id/planning_tab_divider_or"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/or"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/text_small"
+            android:background="@drawable/dark_button_background"
+
+            android:clickable="false"
+            android:layout_below="@id/planning_tab_search_view"/>
+
+        <View
+            android:id="@+id/divider_i"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/planning_tab_divider_or"
+            android:background="@color/color_white"/>
 
         <Button
             android:id="@+id/planning_tab_find_nearby_stops"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/planning_tab_search_bar"
-            android:background="@drawable/button_background" />
+            android:text="@string/home_scr_menu_find_nearby_stops"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/text_medium"
+            android:background="@drawable/dark_button_background"
+
+            android:layout_below="@id/divider_i" />
+
+        <View
+            android:id="@+id/divider_ii"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/planning_tab_find_nearby_stops"
+            android:background="@color/color_white"/>
+
+        <LinearLayout
+            android:id="@+id/planning_tab_navigation_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        </LinearLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/planning_tab_recycler_view"
+            android:background="@color/color_dark_navy_blue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/divider_ii"/>
     </RelativeLayout>
+
+
 </RelativeLayout>

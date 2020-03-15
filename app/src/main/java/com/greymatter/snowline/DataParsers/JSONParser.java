@@ -10,10 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import static com.greymatter.snowline.Data.Constants.*;
+import static com.greymatter.snowline.app.Constants.*;
 
 public class JSONParser {
     protected String currentSring;
@@ -26,20 +23,20 @@ public class JSONParser {
         try{
             JSONObject stopSchedule  = new JSONObject(scheduleInfo).getJSONObject(STOP_SCHEDULE);
 
-            toReturn.setStop(StopParser.parseStopInfo(stopSchedule.getJSONObject(STOP)));
+            toReturn.setStop(StopParser.parse(stopSchedule.getJSONObject(STOP)));
 
             JSONArray routeSchedules = stopSchedule.getJSONArray(ROUTE_SCHEDULES);
 
             for(int i=0;i<routeSchedules.length();i++){
                 //for each route under the current stop
                 JSONObject routeScheduleCurr = routeSchedules.getJSONObject(i);
-                Route currentRoute = RouteParser.parseRouteInfo(routeScheduleCurr.getJSONObject(ROUTE));
+                Route currentRoute = RouteParser.parse(routeScheduleCurr.getJSONObject(ROUTE));
 
                 JSONArray scheduledStops = routeScheduleCurr.getJSONArray(SCHEDULED_STOPS);
                 for(int j=0;j<scheduledStops.length();j++){
                     //for each variant under the current route, add it to the list
                     JSONObject currentVariant = scheduledStops.getJSONObject(j);
-                    RouteVariant toAdd = RouteVariantParser.parseRouteVariantInfo(currentVariant);
+                    RouteVariant toAdd = RouteVariantParser.parse(currentVariant);
                     toAdd.setRouteInfo(currentRoute);
                     toReturn.addRouteVariant(toAdd);
 
@@ -59,7 +56,7 @@ public class JSONParser {
             JSONObject stop = stopSch.getJSONObject(STOP);
             JSONArray routeSchedules = stopSch.getJSONArray(ROUTE_SCHEDULES);
 
-            System.out.println(new StopParser().parseStopInfo(stop));
+            System.out.println(new StopParser().parse(stop));
 
             toReturn.setStopName(stop.getString(NAME));
             for(int i=0;i<routeSchedules.length();i++){

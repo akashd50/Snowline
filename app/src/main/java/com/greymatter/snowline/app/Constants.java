@@ -1,7 +1,6 @@
-package com.greymatter.snowline.Data;
+package com.greymatter.snowline.app;
 
 import android.app.Activity;
-import android.content.Context;
 import android.util.DisplayMetrics;
 
 public class Constants {
@@ -9,6 +8,14 @@ public class Constants {
     public static final String API_KEY = "8G55aku8pgETTxnuI5N";
     public static final int USAGE_SHORT = 1001;
     public static final int USAGE_LONG = 1002;
+    public static final int SUCCESS = 1;
+    public static final int FAIL = 0;
+    public static final String DEFAULT_USER = "default_user";
+
+    //Activity Tags
+    public static final String HOME_ACTIVITY = "Home Activity: INFO";
+    public static final String HOME_ACTIVITY_HELPER = "Home Activity Helper: INFO";
+    public static final String PLANNING_TAB = "Planning Tab: INFO";
 
     //parser constants
     public static final String STOP_SCHEDULE = "stop-schedule";
@@ -46,6 +53,37 @@ public class Constants {
     public static final String BIKE_RACK = "bike-rack";
     public static final String WIFI = "wifi";
 
+    //DB Constants
+    public static final String DB_ID = "_id";
+
+    //stops table
+    public static final String DB_STOP_TABLE = "stops_table";
+    public static final String DB_STOP_NUMBER = "stop_number";
+    public static final String DB_STOP_NAME = "stop_name";
+    public static final String DB_STOP_DIRECTION = "stop_direction";
+    public static final String DB_STOP_STREET = "stop_street";
+    public static final String DB_STOP_CROSS_STREET = "stop_cross-street";
+
+    //street table
+    public static final String DB_STREET_TABLE = "street_table";
+    public static final String DB_STREET_NAME = "street_name";
+    public static final String DB_STREET_TYPE = "street_type";
+
+    //center table
+    public static final String DB_CENTER_TABLE = "center_table";
+    public static final String DB_ZONE = "zone";
+    public static final String DB_UTMX = "utm_x";
+    public static final String DB_UTMY = "utm_y";
+    public static final String DB_LATITUDE = "latitude";
+    public static final String DB_LONGITUDE = "longitude";
+
+    //app data table
+    public static final String DB_APP_DATA_TABLE = "app_data_table";
+    public static final String DB_APP_IDS = "app_id";
+    public static final String DB_USER = "user";
+
+
+
     public static int getDisplayHeight(Activity activity){
         DisplayMetrics displayMetrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -58,5 +96,27 @@ public class Constants {
         activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.heightPixels;
         return width;
+    }
+
+    public static int getRealDisplayHeight(Activity activity){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        return height;
+    }
+
+    public static int getRealDisplayWidth(Activity activity){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
+        int width = displayMetrics.heightPixels;
+        return width;
+    }
+
+    public static int getNavigationBarHeight(Activity activity) {
+        int usableHeight = getDisplayHeight(activity);
+        int realHeight = getRealDisplayHeight(activity);
+        if (realHeight > usableHeight)
+            return realHeight - usableHeight;
+        return 0;
     }
 }
