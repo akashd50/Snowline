@@ -5,6 +5,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -12,6 +15,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,7 +30,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.greymatter.snowline.R;
 import com.greymatter.snowline.UI.HomeActivity;
 
-public class MapHandler implements GoogleMap.OnMyLocationButtonClickListener,
+public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
         OnMapReadyCallback {
 
@@ -40,6 +47,8 @@ public class MapHandler implements GoogleMap.OnMyLocationButtonClickListener,
         this.context = context;
         mapFragment = fragment;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
+        LocationRequest locationRequest = LocationRequest.create().setInterval(3000).setFastestInterval(2000).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        fusedLocationClient.requestLocationUpdates(locationRequest, this, Looper.getMainLooper());
     }
 
     public void fusedLocationClientListener(){
@@ -73,15 +82,15 @@ public class MapHandler implements GoogleMap.OnMyLocationButtonClickListener,
         currentMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(
                 activity, R.raw.map_style_json));
 
-        if (ContextCompat.checkSelfPermission(context,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-            } else {
-                ActivityCompat.requestPermissions(activity,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},66);
-            }
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            //if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+           // } else {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION},66);
+
+          // }
         } else {
             // Permission has already been granted
             currentMap.setMyLocationEnabled(true);
@@ -96,6 +105,19 @@ public class MapHandler implements GoogleMap.OnMyLocationButtonClickListener,
     @Override
     public boolean onMyLocationButtonClick() {
         return false;
+    }
+
+    @Override
+    public void onLocationResult(LocationResult locationResult) {
+        for (Location location : locationResult.getLocations()) {
+            System.out.println(location.toString());
+            fusedLocationClientOnSuccess(location);
+        }
+    }
+
+    @Override
+    public void onLocationAvailability(LocationAvailability locationAvailability) {
+        super.onLocationAvailability(locationAvailability);
     }
 
     public Location getLastKnownLocation() {

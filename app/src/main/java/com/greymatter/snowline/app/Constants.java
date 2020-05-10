@@ -6,6 +6,7 @@ import android.util.DisplayMetrics;
 public class Constants {
     public static final String BASE_ADDRESS = "https://api.winnipegtransit.com";
     public static final String API_KEY = "8G55aku8pgETTxnuI5N";
+    public static final String PLACES_API_KEY = "AIzaSyCA55YrApLHTevLttw1mLa1SWXLoojVQCY";
     public static final int USAGE_SHORT = 1001;
     public static final int USAGE_LONG = 1002;
     public static final int SUCCESS = 1;

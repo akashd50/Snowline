@@ -37,18 +37,19 @@ public class HomeActivity extends FragmentActivity{
         planningTab = new PlanningTab(this, (RelativeLayout)findViewById(R.id.planning_tab), mapHandler);
 
         mapFragment.getMapAsync(mapHandler);
-        mapHandler.fusedLocationClientListener();
+        //mapHandler.fusedLocationClientListener();
 
         setUpUIElements();
         setUpOnTouchEventListener();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         mapHandler.onRequestPermissionsResult(requestCode);
     }
 
-    private void setUpUIElements(){
+    private void setUpUIElements() {
         HomeActivityUIHelper.setKeyboardVisibilityListener(HomeActivity.this, planningTab);
     }
 
@@ -103,20 +104,14 @@ public class HomeActivity extends FragmentActivity{
                 int y = (int)event.getRawY();
 
                 switch (event.getAction()){
-
                     case ACTION_DOWN:
-                        switch (v.getId()){
-                        }
 
                         break;
                     case ACTION_MOVE:
-                        switch (v.getId()){
-                        }
+
                         break;
                     case ACTION_UP:
-                        switch (v.getId()){
 
-                        }
                         break;
                 }
 

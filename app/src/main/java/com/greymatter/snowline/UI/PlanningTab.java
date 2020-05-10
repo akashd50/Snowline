@@ -12,20 +12,28 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
 import static com.greymatter.snowline.app.Constants.*;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.greymatter.snowline.Adapters.ScheduleListRAdapter;
 import com.greymatter.snowline.Adapters.SearchViewAdapter;
 import com.greymatter.snowline.Adapters.StopsListAdapterR;
@@ -43,7 +51,6 @@ import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.Objects.Vector;
 import com.greymatter.snowline.R;
 import com.greymatter.snowline.app.Services;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -64,6 +71,7 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     private SearchViewAdapter searchViewAdapter;
     private Handler dbQueryHandler;
     private MapHandler mapHandler;
+    private PlacesClient placesClient;
     public PlanningTab(final Context context, RelativeLayout planningTab, MapHandler mapHandler){
         this.context = context;
         this.parentActivity = (Activity)context;
@@ -81,6 +89,48 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         initSearchListeners();
         initSearchAdapters();
         initDBListeners();
+
+        Places.initialize(context, PLACES_API_KEY);
+        placesClient = Places.createClient(context);
+    }
+
+    private void testAutoComplete(String userQuery){
+        // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
+        // and once again when the user makes a selection (for example when calling fetchPlace()).
+        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+
+        // Create a RectangularBounds object.
+        RectangularBounds bounds = RectangularBounds.newInstance(
+                new LatLng(-49.747023, -96.930679), new LatLng(49.992223, -97.315995));
+        // Use the builder to create a FindAutocompletePredictionsRequest.
+        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                // Call either setLocationBias() OR setLocationRestriction().
+               // .setLocationBias(bounds)
+                //.setLocationRestriction(bounds)
+                .setOrigin(mapHandler.getLastKnownLatLng())
+                .setCountries("CA")
+                .setTypeFilter(TypeFilter.ADDRESS)
+                .setSessionToken(token)
+                .setQuery(userQuery)
+                .build();
+
+        placesClient.findAutocompletePredictions(request).addOnSuccessListener(new OnSuccessListener<FindAutocompletePredictionsResponse>() {
+            @Override
+            public void onSuccess(FindAutocompletePredictionsResponse findAutocompletePredictionsResponse) {
+                Log.v(PLANNING_TAB, "ON Success callback for prediction response. Size -> "+
+                        findAutocompletePredictionsResponse.getAutocompletePredictions().size());
+
+                for(AutocompletePrediction p : findAutocompletePredictionsResponse.getAutocompletePredictions()){
+                    Log.v(PLANNING_TAB, p.toString());
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.v(PLANNING_TAB, "Unable to find suggestions");
+                e.printStackTrace();
+            }
+        });
     }
 
     private void findViews(){
@@ -151,8 +201,8 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
                     animateLayout(300, 0);
                 }
 
-                stopDBHelper.getSimilar(newText, dbQueryHandler);
-
+                //stopDBHelper.getSimilar(newText, dbQueryHandler);
+                testAutoComplete(newText);
                 return false;
             }
         });
@@ -207,7 +257,7 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         searchViewAdapter = new SearchViewAdapter(context, null, false);
         searchView.setSuggestionsAdapter(searchViewAdapter);
 
-
+        searchView.setQueryHint("enter stop number or address..");
     }
 
     private void initDBListeners(){

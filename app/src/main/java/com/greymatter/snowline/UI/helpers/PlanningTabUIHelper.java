@@ -1,13 +1,10 @@
 package com.greymatter.snowline.UI.helpers;
 
-import android.app.AlertDialog;
 import android.graphics.Color;
 import android.location.Location;
-
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.greymatter.snowline.DataParsers.StopParser;
 import com.greymatter.snowline.Handlers.LinkGenerator;
@@ -21,7 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
 public class PlanningTabUIHelper {
 
     public static void updateMap(MapHandler mapHandler, int distance, ArrayList<Stop> stopList){
@@ -42,9 +38,7 @@ public class PlanningTabUIHelper {
         }
     }
 
-    public static void findNearbyStops(int distance) {
-
-
+    public static void findNearbyStops(String address) {
         //ArrayList<Stop> nearbyStops = HomeActivityHelper.getNearbyStops(mapHandler.getLastKnownLocation(), distance);
 
 
