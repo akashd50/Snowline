@@ -1,6 +1,5 @@
-package com.greymatter.snowline.UI;
+package com.greymatter.snowline.ui;
 
-import android.location.Location;
 import android.os.Bundle;
 
 import android.view.MotionEvent;
@@ -9,10 +8,9 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
+
 import com.google.android.gms.maps.SupportMapFragment;
-import com.greymatter.snowline.UI.helpers.HomeActivityUIHelper;
+import com.greymatter.snowline.ui.helpers.HomeActivityUIHelper;
 import com.greymatter.snowline.Handlers.MapHandler;
 import com.greymatter.snowline.R;
 

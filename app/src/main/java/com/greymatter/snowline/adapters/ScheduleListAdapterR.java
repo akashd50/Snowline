@@ -1,4 +1,4 @@
-package com.greymatter.snowline.Adapters;
+package com.greymatter.snowline.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,20 +9,19 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.greymatter.snowline.Objects.RouteVariant;
-import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.R;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class StopsListAdapterR extends RecyclerView.Adapter<StopsListAdapterR.ListLineHolder> {
-    private ArrayList<Stop> localList;
-    private View.OnClickListener listClickListener;
-    public StopsListAdapterR(View.OnClickListener listClickListener){
-        this.listClickListener = listClickListener;
+public class ScheduleListAdapterR extends RecyclerView.Adapter<ListLineHolder> {
+    private ArrayList<RouteVariant> localList;
+
+    public ScheduleListAdapterR() {
         localList = new ArrayList<>();
     }
+
     public void updateLocalList(ArrayList list){
         localList.clear();
         localList.addAll(list);
@@ -33,39 +32,35 @@ public class StopsListAdapterR extends RecyclerView.Adapter<StopsListAdapterR.Li
         return localList.size();
     }
 
-    public Stop getItem(int pos){
+    public RouteVariant getItem(int pos){
         return localList.get(pos);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ListLineHolder holder, int position) {
-        TextView stopNum = holder.lineView.findViewById(R.id.stop_format_stop_number);
-        TextView stopName = holder.lineView.findViewById(R.id.stop_format_stop_name);
+        TextView routeNum = holder.getLineView().findViewById(R.id.route_number);
+        TextView routeName = holder.getLineView().findViewById(R.id.route_name);
+        TextView routeTime = holder.getLineView().findViewById(R.id.route_times);
 
-        Stop stop = (Stop)getItem(position);
-        stopNum.setText(stop.getNumber());
-        stopName.setText(stop.getName());
+        RouteVariant routeVariant = (RouteVariant)getItem(position);
+        routeNum.setText(routeVariant.getNumber());
+        routeName.setText(routeVariant.getVariantName());
+
+        String time = routeVariant.getTimeinfo().getEstimatedArrival();
+        if(time!=null) {
+            routeTime.setText(LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                    .format(DateTimeFormatter.ofPattern("hh:mm a")));
+        }
+        //TextView routeInfo = vi.findViewById(R.id.route_info_view);
     }
 
     @NonNull
     @Override
     public ListLineHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.stop_format, parent, false);
+                .inflate(R.layout.schedule_format, parent, false);
         ListLineHolder listLine = new ListLineHolder(v);
-        v.setOnClickListener(listClickListener);
         return listLine;
-    }
-
-    public static class ListLineHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
-        public View lineView;
-        public ListLineHolder(View v) {
-            super(v);
-            lineView = v;
-        }
-
-
     }
 
     public void clear(){

@@ -1,4 +1,4 @@
-package com.greymatter.snowline.UI;
+package com.greymatter.snowline.ui;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
@@ -34,16 +34,16 @@ import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.greymatter.snowline.Adapters.ScheduleListRAdapter;
-import com.greymatter.snowline.Adapters.SearchViewAdapter;
-import com.greymatter.snowline.Adapters.StopsListAdapterR;
+import com.greymatter.snowline.adapters.ScheduleListAdapterR;
+import com.greymatter.snowline.adapters.SearchViewAdapter;
+import com.greymatter.snowline.adapters.StopsListAdapterR;
 import com.greymatter.snowline.Data.database.StopDBHelper;
 import com.greymatter.snowline.Data.entities.StopEntity;
 import com.greymatter.snowline.Handlers.MapHandler;
 import com.greymatter.snowline.Objects.Stop;
-import com.greymatter.snowline.UI.helpers.PlanningTabUIHelper;
+import com.greymatter.snowline.ui.helpers.PlanningTabUIHelper;
 import com.greymatter.snowline.app.Constants;
-import com.greymatter.snowline.UI.helpers.HomeActivityUIHelper;
+import com.greymatter.snowline.ui.helpers.HomeActivityUIHelper;
 import com.greymatter.snowline.Handlers.KeyboardVisibilityListener;
 import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.Handlers.Validator;
@@ -64,21 +64,19 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     private Vector translationDelta, locationBeforeAnim;
     private LinkGenerator linkGenerator;
     private RecyclerView planningTabListView;
-    private ScheduleListRAdapter scheduleListAdapter;
+    private ScheduleListAdapterR scheduleListAdapter;
     private StopsListAdapterR stopListAdapter;
     private RecyclerView.LayoutManager layoutManager;
-    private StopDBHelper stopDBHelper;
     private SearchViewAdapter searchViewAdapter;
     private Handler dbQueryHandler;
     private MapHandler mapHandler;
-    private PlacesClient placesClient;
+
     public PlanningTab(final Context context, RelativeLayout planningTab, MapHandler mapHandler){
         this.context = context;
         this.parentActivity = (Activity)context;
         this.mainLayout = planningTab;
         this.mapHandler = mapHandler;
         searchBarHasFocus = false;
-        stopDBHelper = new StopDBHelper(Services.getDatabase(context));
 
         findViews();
         initRecyclerViewAdapters();
@@ -90,47 +88,7 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         initSearchAdapters();
         initDBListeners();
 
-        Places.initialize(context, PLACES_API_KEY);
-        placesClient = Places.createClient(context);
-    }
-
-    private void testAutoComplete(String userQuery){
-        // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
-        // and once again when the user makes a selection (for example when calling fetchPlace()).
-        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-
-        // Create a RectangularBounds object.
-        RectangularBounds bounds = RectangularBounds.newInstance(
-                new LatLng(-49.747023, -96.930679), new LatLng(49.992223, -97.315995));
-        // Use the builder to create a FindAutocompletePredictionsRequest.
-        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                // Call either setLocationBias() OR setLocationRestriction().
-               // .setLocationBias(bounds)
-                //.setLocationRestriction(bounds)
-                .setOrigin(mapHandler.getLastKnownLatLng())
-                .setCountries("CA")
-                .setTypeFilter(TypeFilter.ADDRESS)
-                .setSessionToken(token)
-                .setQuery(userQuery)
-                .build();
-
-        placesClient.findAutocompletePredictions(request).addOnSuccessListener(new OnSuccessListener<FindAutocompletePredictionsResponse>() {
-            @Override
-            public void onSuccess(FindAutocompletePredictionsResponse findAutocompletePredictionsResponse) {
-                Log.v(PLANNING_TAB, "ON Success callback for prediction response. Size -> "+
-                        findAutocompletePredictionsResponse.getAutocompletePredictions().size());
-
-                for(AutocompletePrediction p : findAutocompletePredictionsResponse.getAutocompletePredictions()){
-                    Log.v(PLANNING_TAB, p.toString());
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.v(PLANNING_TAB, "Unable to find suggestions");
-                e.printStackTrace();
-            }
-        });
+        PlanningTabNavigationalView.init(R.id.planning_tab_navigation_bar, context);
     }
 
     private void findViews(){
@@ -182,7 +140,7 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
                     Log.v("Logging DB Entries","------------------------------");
 
                     StopSchedule currSchedule = displayStopSchedule(query);
-                    addToDB(currSchedule.getStop());
+                    PlanningTabUIHelper.addToDB(currSchedule.getStop());
                 }
                 if (searchBarHasFocus) {
                     searchBarHasFocus = false;
@@ -202,7 +160,6 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
                 }
 
                 //stopDBHelper.getSimilar(newText, dbQueryHandler);
-                testAutoComplete(newText);
                 return false;
             }
         });
@@ -288,7 +245,7 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
             }
         };
 
-        scheduleListAdapter = new ScheduleListRAdapter();
+        scheduleListAdapter = new ScheduleListAdapterR();
         stopListAdapter = new StopsListAdapterR(listClickListener);
     }
 
@@ -375,16 +332,15 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     }
 
     public void translateMainLayoutTo(int x, int y, int dx, int dy) {
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
-                mainLayout.getLayoutParams();
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mainLayout.getLayoutParams();
 
       //  if(mainLayout.getTranslationY() < 100 || mainLayout.getTranslationY() > getDisplayHeight(parentActivity)-100) return;
         if(y-dy < 5 || y-dy > getDisplayHeight(parentActivity)-100) return;
 
         mainLayout.setTranslationY(y-dy);
 
-        Log.v(PLANNING_TAB, "Relative Layout translation Y: " + mainLayout.getTranslationY());
-        Log.v(PLANNING_TAB, "Relative Layout display height: " + Constants.getDisplayHeight(parentActivity));
+        //Log.v(PLANNING_TAB, "Relative Layout translation Y: " + mainLayout.getTranslationY());
+        //Log.v(PLANNING_TAB, "Relative Layout display height: " + Constants.getDisplayHeight(parentActivity));
 
         layoutParams.height = (int) (Constants.getDisplayHeight(parentActivity) - (mainLayout.getTranslationY()));
 
@@ -424,21 +380,11 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         if(stopSchedule!=null) {
             scheduleListAdapter.updateLocalList(stopSchedule.getRoutes());
             scheduleListAdapter.notifyDataSetChanged();
+            PlanningTabNavigationalView.addRecyclerView(context, stopSchedule.getRoutes());
         }
         return stopSchedule;
     }
 
-    public void addToDB(Stop stop){
-        final StopEntity stopEntity = new StopEntity();
-        if(stop!=null) {
-            stopEntity.key = Integer.parseInt(stop.getNumber());
-            stopEntity.stopName = stop.getName();
-            stopEntity.stopNumber = stop.getNumber();
-            stopEntity.direction = stop.getDirection();
-            if(!stopDBHelper.find(stop.getNumber())){
-                stopDBHelper.addStop(stopEntity);
-            }
-        }
-    }
+
 
 }

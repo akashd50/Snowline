@@ -1,4 +1,4 @@
-package com.greymatter.snowline.Adapters;
+package com.greymatter.snowline.adapters;
 
 import android.content.Context;
 import android.database.Cursor;

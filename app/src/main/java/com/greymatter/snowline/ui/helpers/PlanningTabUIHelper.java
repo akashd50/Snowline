@@ -1,17 +1,21 @@
-package com.greymatter.snowline.UI.helpers;
+package com.greymatter.snowline.ui.helpers;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.greymatter.snowline.Data.database.StopDBHelper;
+import com.greymatter.snowline.Data.entities.StopEntity;
 import com.greymatter.snowline.DataParsers.StopParser;
 import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.Handlers.MapHandler;
 import com.greymatter.snowline.Handlers.RequestHandler;
 import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.app.Constants;
+import com.greymatter.snowline.app.Services;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +23,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 public class PlanningTabUIHelper {
+    private static StopDBHelper stopDBHelper;
+
+    public static void init(Context context) {
+        stopDBHelper = new StopDBHelper(Services.getDatabase(context));
+    }
 
     public static void updateMap(MapHandler mapHandler, int distance, ArrayList<Stop> stopList){
         GoogleMap currentMap = mapHandler.getCurrentMap();
@@ -74,5 +83,18 @@ public class PlanningTabUIHelper {
             e.printStackTrace();
         }
         return nearbyStops;
+    }
+
+    public static void addToDB(Stop stop){
+        final StopEntity stopEntity = new StopEntity();
+        if(stop!=null) {
+            stopEntity.key = Integer.parseInt(stop.getNumber());
+            stopEntity.stopName = stop.getName();
+            stopEntity.stopNumber = stop.getNumber();
+            stopEntity.direction = stop.getDirection();
+            if(!stopDBHelper.find(stop.getNumber())){
+                stopDBHelper.addStop(stopEntity);
+            }
+        }
     }
 }

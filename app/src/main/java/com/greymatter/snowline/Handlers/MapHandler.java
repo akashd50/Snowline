@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 
@@ -28,7 +26,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.greymatter.snowline.R;
-import com.greymatter.snowline.UI.HomeActivity;
 
 public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,

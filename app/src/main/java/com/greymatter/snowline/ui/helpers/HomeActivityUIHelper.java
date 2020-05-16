@@ -1,4 +1,4 @@
-package com.greymatter.snowline.UI.helpers;
+package com.greymatter.snowline.ui.helpers;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Location;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -20,13 +19,12 @@ import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.Handlers.RequestHandler;
 import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.DataParsers.RouteParser;
-import com.greymatter.snowline.DataParsers.StopParser;
 import com.greymatter.snowline.DataParsers.StopScheduleParser;
 import com.greymatter.snowline.Objects.Route;
 import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.R;
-import com.greymatter.snowline.UI.StopScheduleActivity;
+import com.greymatter.snowline.ui.StopScheduleActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;

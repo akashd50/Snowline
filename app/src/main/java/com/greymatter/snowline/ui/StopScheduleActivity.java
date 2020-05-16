@@ -1,4 +1,4 @@
-package com.greymatter.snowline.UI;
+package com.greymatter.snowline.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.greymatter.snowline.Adapters.ScheduleListRAdapter;
+import com.greymatter.snowline.adapters.ScheduleListAdapterR;
 import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.DataParsers.StopScheduleParser;
 import com.greymatter.snowline.Handlers.LinkGenerator;
@@ -37,7 +37,7 @@ public class StopScheduleActivity extends AppCompatActivity {
     private final Boolean isFetchComplete = new Boolean(false);
     private LinkGenerator linkGenerator;
     private RecyclerView recyclerView;
-    private ScheduleListRAdapter mAdapter;
+    private ScheduleListAdapterR mAdapter;
     private RecyclerView.LayoutManager layoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ public class StopScheduleActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        mAdapter = new ScheduleListRAdapter();
+        mAdapter = new ScheduleListAdapterR();
         recyclerView.setAdapter(mAdapter);
 
         findSchedule.setOnClickListener(new View.OnClickListener() {

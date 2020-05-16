@@ -7,14 +7,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:hardwareAccelerated="true"
-    tools:context=".UI.HomeActivity">
+    tools:context=".ui.HomeActivity">
 
     <fragment
         android:id="@+id/mapView"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".UI.HomeActivity"
+        tools:context=".ui.HomeActivity"
         android:hardwareAccelerated="true"/>
 
     <RelativeLayout
@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:background="@color/color_dark_navy_blue"
         android:orientation="vertical">
+
         <Button
             android:id="@+id/planning_tab_drag_view"
             android:layout_width="match_parent"
@@ -46,7 +47,6 @@
             android:textColor="@color/color_white"
             android:textSize="@dimen/text_small"
             android:background="@drawable/dark_button_background"
-
             android:clickable="false"
             android:layout_below="@id/planning_tab_search_view"/>
 
@@ -65,7 +65,6 @@
             android:textColor="@color/color_white"
             android:textSize="@dimen/text_medium"
             android:background="@drawable/dark_button_background"
-
             android:layout_below="@id/divider_i" />
 
         <View
@@ -78,18 +77,24 @@
         <LinearLayout
             android:id="@+id/planning_tab_navigation_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
+            android:layout_height="200dp"
+            android:orientation="horizontal"
+            android:layout_below="@id/divider_ii">
         </LinearLayout>
 
+        <View
+            android:id="@+id/divider_iii"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/planning_tab_navigation_bar"
+            android:background="@color/color_white"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/planning_tab_recycler_view"
             android:background="@color/color_dark_navy_blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/divider_ii"/>
+            android:layout_below="@id/divider_iii"/>
     </RelativeLayout>
 
 
