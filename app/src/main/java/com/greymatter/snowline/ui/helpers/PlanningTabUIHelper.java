@@ -3,6 +3,8 @@ package com.greymatter.snowline.ui.helpers;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
+import android.util.Log;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -10,10 +12,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.greymatter.snowline.Data.database.StopDBHelper;
 import com.greymatter.snowline.Data.entities.StopEntity;
 import com.greymatter.snowline.DataParsers.StopParser;
+import com.greymatter.snowline.DataParsers.StopScheduleParser;
 import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.Handlers.MapHandler;
 import com.greymatter.snowline.Handlers.RequestHandler;
 import com.greymatter.snowline.Objects.Stop;
+import com.greymatter.snowline.Objects.StopSchedule;
+import com.greymatter.snowline.Objects.TypeCommon;
 import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.app.Services;
 
@@ -22,6 +27,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import static com.greymatter.snowline.app.Constants.HOME_ACTIVITY_HELPER;
+import static com.greymatter.snowline.app.Constants.STOP_SCHEDULE;
+
 public class PlanningTabUIHelper {
     private static StopDBHelper stopDBHelper;
 
@@ -64,8 +73,8 @@ public class PlanningTabUIHelper {
 //        });
     }
 
-    public static ArrayList<Stop> getNearbyStops(Location location, int radius){
-        ArrayList<Stop> nearbyStops = new ArrayList<>();
+    public static ArrayList<TypeCommon> getNearbyStops(Location location, int radius){
+        ArrayList<TypeCommon> nearbyStops = new ArrayList<>();
         final LinkGenerator linkGenerator = new LinkGenerator();
         linkGenerator.generateStopLink().apiKey()
                 .latLon(location.getLatitude()+"", location.getLongitude()+"")
@@ -96,5 +105,20 @@ public class PlanningTabUIHelper {
                 stopDBHelper.addStop(stopEntity);
             }
         }
+    }
+
+    public static StopSchedule fetchStopSchedule(LinkGenerator linkGenerator){
+
+        Log.v(HOME_ACTIVITY_HELPER, "Fetching schedule information");
+
+        String json = RequestHandler.makeRequest(linkGenerator).toString();
+        StopSchedule stopSchedule = null;
+        try {
+            stopSchedule = StopScheduleParser.parse(new JSONObject(json)
+                    .getJSONObject(STOP_SCHEDULE));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return stopSchedule;
     }
 }

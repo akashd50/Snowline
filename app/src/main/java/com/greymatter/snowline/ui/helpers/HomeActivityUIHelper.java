@@ -137,19 +137,4 @@ public class HomeActivityUIHelper {
         float marginOfError = Math.round(converted);
         return heightDiff > marginOfError;
     }
-
-    public static StopSchedule fetchStopSchedule(LinkGenerator linkGenerator){
-
-        Log.v(HOME_ACTIVITY_HELPER, "Fetching schedule information");
-
-        String json = RequestHandler.makeRequest(linkGenerator).toString();
-        StopSchedule stopSchedule = null;
-        try {
-            stopSchedule = StopScheduleParser.parse(new JSONObject(json)
-                    .getJSONObject(STOP_SCHEDULE));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return stopSchedule;
-    }
 }

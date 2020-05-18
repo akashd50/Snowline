@@ -1,4 +1,4 @@
-package com.greymatter.snowline.adapters;
+package com.greymatter.snowline.ui.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +13,23 @@ import com.greymatter.snowline.R;
 
 import java.util.ArrayList;
 
-public class StopsListAdapterR extends RecyclerView.Adapter<ListLineHolder> {
+public class StopsListAdapterR extends RecyclerView.Adapter<ListLineHolder> implements TypeCommonAdapter {
     private ArrayList<Stop> localList;
     private View.OnClickListener listClickListener;
+
     public StopsListAdapterR(View.OnClickListener listClickListener){
         this.listClickListener = listClickListener;
         localList = new ArrayList<>();
     }
+
+    public StopsListAdapterR(){
+        localList = new ArrayList<>();
+    }
+
+    public void setOnClickListener(View.OnClickListener listener) {
+        this.listClickListener = listener;
+    }
+
     public void updateLocalList(ArrayList list){
         localList.clear();
         localList.addAll(list);

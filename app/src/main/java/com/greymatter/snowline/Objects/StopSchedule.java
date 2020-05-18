@@ -2,7 +2,7 @@ package com.greymatter.snowline.Objects;
 
 import java.util.ArrayList;
 
-public class StopSchedule {
+public class StopSchedule implements TypeCommon {
     private Stop stop;
     private ArrayList<RouteVariant> routes;
 
@@ -22,7 +22,7 @@ public class StopSchedule {
         this.stop = stop;
     }
 
-    public ArrayList<RouteVariant> getRoutes() {
+    public ArrayList getRoutes() {
         return routes;
     }
 }

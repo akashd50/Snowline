@@ -1,6 +1,7 @@
 package com.greymatter.snowline.ui;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -14,7 +15,6 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_MOVE;
@@ -22,35 +22,22 @@ import static android.view.MotionEvent.ACTION_UP;
 import static com.greymatter.snowline.app.Constants.*;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
-import com.google.android.libraries.places.api.net.PlacesClient;
-import com.greymatter.snowline.adapters.ScheduleListAdapterR;
-import com.greymatter.snowline.adapters.SearchViewAdapter;
-import com.greymatter.snowline.adapters.StopsListAdapterR;
-import com.greymatter.snowline.Data.database.StopDBHelper;
-import com.greymatter.snowline.Data.entities.StopEntity;
+import com.greymatter.snowline.Objects.TypeCommon;
+import com.greymatter.snowline.ui.adapters.ScheduleListAdapterR;
+import com.greymatter.snowline.ui.adapters.SearchViewAdapter;
+import com.greymatter.snowline.ui.adapters.StopsListAdapterR;
 import com.greymatter.snowline.Handlers.MapHandler;
 import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.ui.helpers.PlanningTabUIHelper;
 import com.greymatter.snowline.app.Constants;
-import com.greymatter.snowline.ui.helpers.HomeActivityUIHelper;
 import com.greymatter.snowline.Handlers.KeyboardVisibilityListener;
 import com.greymatter.snowline.Handlers.LinkGenerator;
 import com.greymatter.snowline.Handlers.Validator;
 import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.Objects.Vector;
 import com.greymatter.snowline.R;
-import com.greymatter.snowline.app.Services;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -79,11 +66,9 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         searchBarHasFocus = false;
 
         findViews();
-        initRecyclerViewAdapters();
 
         init();
         initButtonsListener();
-        initRecyclerView();
         initSearchListeners();
         initSearchAdapters();
         initDBListeners();
@@ -116,12 +101,9 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
                 switch (v.getId()){
                     case R.id.planning_tab_find_nearby_stops:
                         if (mapHandler.getLastKnownLocation() != null) {
-
                             displayNearbyStops(500);
                             mapHandler.getCurrentMap().
                                     animateCamera(CameraUpdateFactory.newLatLng(mapHandler.getLastKnownLatLng()));
-
-
                         }
                         break;
                 }
@@ -233,30 +215,6 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         };
     }
 
-    private void initRecyclerViewAdapters(){
-        View.OnClickListener listClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int itemPosition = planningTabListView.getChildLayoutPosition(v);
-                Stop stopSelected = stopListAdapter.getItem(itemPosition);
-                if(stopSelected!=null){
-                    displayStopSchedule(stopSelected.getNumber());
-                }
-            }
-        };
-
-        scheduleListAdapter = new ScheduleListAdapterR();
-        stopListAdapter = new StopsListAdapterR(listClickListener);
-    }
-
-    private void initRecyclerView(){
-        planningTabListView = mainLayout.findViewById(R.id.planning_tab_recycler_view);
-
-        layoutManager = new LinearLayoutManager(context);
-        planningTabListView.setLayoutManager(layoutManager);
-
-        planningTabListView.setAdapter(scheduleListAdapter);
-    }
 
     public void animateLayout(int duration, float finalPos){
 
@@ -288,9 +246,11 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         boolean eventHandled = false;
         switch (event.getAction()){
             case ACTION_DOWN:
-                Log.v(PLANNING_TAB, "Planning Tab Click Detected!");
+                Log.v(PLANNING_TAB, "Planning Tab Down");
                 switch (v.getId()){
-                    case R.id.planning_tab: case R.id.planning_tab_drag_view:
+                    case R.id.planning_tab:
+                    case R.id.planning_tab_drag_view:
+                        Log.v(PLANNING_TAB, "Planning Tab and drag view touch down Detected!");
                         translationDelta.x = x - (int)mainLayout.getTranslationX();
                         translationDelta.y = y - (int)mainLayout.getTranslationY();
                         return true;
@@ -301,16 +261,17 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
 
                 break;
             case ACTION_MOVE:
-                Log.v(PLANNING_TAB, "Planning Tab Click Move Detected!");
+                Log.v(PLANNING_TAB, "Planning Tab Move");
 
                 switch (v.getId()){
-                    case R.id.planning_tab: case R.id.planning_tab_drag_view:
+                    case R.id.planning_tab:
+                    case R.id.planning_tab_drag_view:
                         translateMainLayoutTo(x,y,translationDelta.x, translationDelta.y);
                         return true;
                 }
                 break;
             case ACTION_UP:
-                Log.v(PLANNING_TAB, "Planning Tab Click Up Detected!");
+                Log.v(PLANNING_TAB, "Planning Tab Up");
 
                 switch (v.getId()){
                     case R.id.planning_tab_drag_view:
@@ -350,16 +311,25 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     }
 
     public void displayNearbyStops(int distance) {
-        //update the adapter
-        planningTabListView.setAdapter(stopListAdapter);
-
-        ArrayList<Stop> nearbyStops = PlanningTabUIHelper.getNearbyStops(
+        ArrayList nearbyStops = PlanningTabUIHelper.getNearbyStops(
                 mapHandler.getLastKnownLocation(), distance);
-        stopListAdapter.updateLocalList(nearbyStops);
-        stopListAdapter.notifyDataSetChanged();
 
+        @SuppressLint("HandlerLeak")
+        Handler handler = new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                View v = (View)msg.obj;
+                Log.v(PLANNING_TAB, "Stop View On Click");
+                int itemPosition = PlanningTabNavigationalView.getCurrentView().getChildLayoutPosition(v);
+                Stop stopSelected = ((StopsListAdapterR)PlanningTabNavigationalView.getNavViewAdapter().getAdapter(PlanningTabNavigationalView.getCurrentIndex())).getItem(itemPosition);
+                if(stopSelected!=null){
+                    displayStopSchedule(stopSelected.getNumber());
+                }
+            }
+        };
+
+        PlanningTabNavigationalView.addView(nearbyStops, handler);
         PlanningTabUIHelper.updateMap(mapHandler,distance, nearbyStops);
-
         mapHandler.getCurrentMap().setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -370,21 +340,14 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     }
 
     public StopSchedule displayStopSchedule(String stopNumber){
-        planningTabListView.setAdapter(scheduleListAdapter);
-
         linkGenerator = new LinkGenerator();
         linkGenerator.generateStopScheduleLink(stopNumber).apiKey()
                 .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
 
-        StopSchedule stopSchedule = HomeActivityUIHelper.fetchStopSchedule(linkGenerator);
+        StopSchedule stopSchedule = PlanningTabUIHelper.fetchStopSchedule(linkGenerator);
         if(stopSchedule!=null) {
-            scheduleListAdapter.updateLocalList(stopSchedule.getRoutes());
-            scheduleListAdapter.notifyDataSetChanged();
-            PlanningTabNavigationalView.addRecyclerView(context, stopSchedule.getRoutes());
+            PlanningTabNavigationalView.addView(stopSchedule.getRoutes(), null);
         }
         return stopSchedule;
     }
-
-
-
 }

@@ -35,7 +35,6 @@ public class HomeActivity extends FragmentActivity{
         planningTab = new PlanningTab(this, (RelativeLayout)findViewById(R.id.planning_tab), mapHandler);
 
         mapFragment.getMapAsync(mapHandler);
-        //mapHandler.fusedLocationClientListener();
 
         setUpUIElements();
         setUpOnTouchEventListener();

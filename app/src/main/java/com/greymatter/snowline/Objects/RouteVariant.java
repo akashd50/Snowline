@@ -1,6 +1,6 @@
 package com.greymatter.snowline.Objects;
 
-public class RouteVariant extends Route{
+public class RouteVariant extends Route {
     private boolean cancelled;
     private Times timeinfo;
     private String key, variantKey, variantName;

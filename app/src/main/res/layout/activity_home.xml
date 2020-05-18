@@ -77,12 +77,22 @@
         <LinearLayout
             android:id="@+id/planning_tab_navigation_bar"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             android:layout_below="@id/divider_ii">
+           <!-- <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/nav_bar_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/nav_bar_rec_view"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_height="match_parent"/>
+
         </LinearLayout>
 
-        <View
+       <!-- <View
             android:id="@+id/divider_iii"
             android:layout_width="match_parent"
             android:layout_height="2dp"
@@ -94,7 +104,7 @@
             android:background="@color/color_dark_navy_blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/divider_iii"/>
+            android:layout_below="@id/divider_iii"/>-->
     </RelativeLayout>
 
 

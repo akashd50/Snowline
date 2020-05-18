@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.greymatter.snowline.adapters.ScheduleListAdapterR;
+import com.greymatter.snowline.ui.adapters.ScheduleListAdapterR;
 import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.DataParsers.StopScheduleParser;
 import com.greymatter.snowline.Handlers.LinkGenerator;

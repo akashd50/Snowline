@@ -1,4 +1,4 @@
-package com.greymatter.snowline.adapters;
+package com.greymatter.snowline.ui.adapters;
 
 import android.view.View;
 

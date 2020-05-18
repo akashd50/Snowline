@@ -44,7 +44,7 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
         this.context = context;
         mapFragment = fragment;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
-        LocationRequest locationRequest = LocationRequest.create().setInterval(3000).setFastestInterval(2000).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationRequest locationRequest = LocationRequest.create().setInterval(10000).setFastestInterval(5000).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         fusedLocationClient.requestLocationUpdates(locationRequest, this, Looper.getMainLooper());
     }
 

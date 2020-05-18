@@ -17,7 +17,7 @@ public class Constants {
     public static final String HOME_ACTIVITY = "Home Activity: INFO";
     public static final String HOME_ACTIVITY_HELPER = "Home Activity Helper: INFO";
     public static final String PLANNING_TAB = "Planning Tab: INFO";
-
+    public static final String NAV_TAB = "Nav View: INFO";
     //parser constants
     public static final String STOP_SCHEDULE = "stop-schedule";
     public static final String STOP = "stop";

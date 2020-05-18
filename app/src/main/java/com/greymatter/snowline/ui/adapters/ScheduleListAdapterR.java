@@ -1,4 +1,4 @@
-package com.greymatter.snowline.adapters;
+package com.greymatter.snowline.ui.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class ScheduleListAdapterR extends RecyclerView.Adapter<ListLineHolder> {
+public class ScheduleListAdapterR extends RecyclerView.Adapter<ListLineHolder> implements TypeCommonAdapter {
     private ArrayList<RouteVariant> localList;
 
     public ScheduleListAdapterR() {

@@ -2,7 +2,7 @@ package com.greymatter.snowline.Objects;
 
 import java.util.ArrayList;
 
-public class Route {
+public class Route implements TypeCommon {
     private String key, name, number, coverage;
 
     public Route(String key, String number, String name){

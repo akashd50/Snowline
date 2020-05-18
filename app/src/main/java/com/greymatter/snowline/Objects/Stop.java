@@ -2,7 +2,7 @@ package com.greymatter.snowline.Objects;
 
 import com.greymatter.snowline.Data.entities.StopEntity;
 
-public class Stop {
+public class Stop implements TypeCommon {
     private String number, name, direction;
     private Street street, crossStreet;
     private Centre centre;
