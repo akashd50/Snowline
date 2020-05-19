@@ -15,9 +15,9 @@ import android.widget.Toast;
 import com.greymatter.snowline.ui.adapters.ScheduleListAdapterR;
 import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.DataParsers.StopScheduleParser;
-import com.greymatter.snowline.Handlers.LinkGenerator;
+import com.greymatter.snowline.Objects.WTRequest;
 import com.greymatter.snowline.R;
-import com.greymatter.snowline.Handlers.RequestHandler;
+import com.greymatter.snowline.Handlers.WTRequestHandler;
 import com.greymatter.snowline.Objects.RouteVariant;
 import com.greymatter.snowline.Objects.StopSchedule;
 
@@ -35,7 +35,7 @@ public class StopScheduleActivity extends AppCompatActivity {
     private Button findSchedule;
     private ArrayList<RouteVariant> localList;
     private final Boolean isFetchComplete = new Boolean(false);
-    private LinkGenerator linkGenerator;
+    private WTRequest WTRequest;
     private RecyclerView recyclerView;
     private ScheduleListAdapterR mAdapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -75,12 +75,12 @@ public class StopScheduleActivity extends AppCompatActivity {
     }
 
     private void fetchStopSchedule(String stopNumber){
-        linkGenerator = new LinkGenerator();
-        linkGenerator.generateStopScheduleLink(stopNumber).apiKey()
+        WTRequest = new WTRequest();
+        WTRequest.generateStopScheduleLink(stopNumber).apiKey()
                 .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
         Log.v(TAG, "Fetching schedule information");
 
-        String json = RequestHandler.makeRequest(linkGenerator).toString();
+        String json = WTRequestHandler.makeRequest(WTRequest).toString();
         StopSchedule stopSchedule = null;
         try {
             stopSchedule = StopScheduleParser.parse(new JSONObject(json)
@@ -89,7 +89,7 @@ public class StopScheduleActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        mAdapter.updateLocalList(stopSchedule.getRoutes());
+        mAdapter.onNewDataAdded(stopSchedule.getRoutes());
         mAdapter.notifyDataSetChanged();
     }
 }

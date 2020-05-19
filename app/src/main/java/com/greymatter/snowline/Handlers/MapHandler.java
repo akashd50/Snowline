@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -24,13 +23,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.greymatter.snowline.R;
 
 public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
         OnMapReadyCallback {
-
     private Context context;
     private Location lastKnownLocation;
     private LatLng lastKnownLatLng;
@@ -48,23 +45,7 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
         fusedLocationClient.requestLocationUpdates(locationRequest, this, Looper.getMainLooper());
     }
 
-    public void fusedLocationClientListener(){
-        fusedLocationClient.getLastLocation()
-        .addOnSuccessListener(activity, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location != null) {
-                    fusedLocationClientOnSuccess(location);
-                    Log.v("HOME ACTIVITY", getLastKnownLocation().toString());
-                    if(currentMap!=null){
-                        currentMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastKnownLatLng(),15));
-                    }
-                }
-            }
-        });
-    }
-
-    public void fusedLocationClientOnSuccess(Location lastKnownLocation){
+    private void setLocation(Location lastKnownLocation){
         this.lastKnownLocation = lastKnownLocation;
         lastKnownLatLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
     }
@@ -81,13 +62,7 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
 
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            //if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-           // } else {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION},66);
-
-          // }
         } else {
             // Permission has already been granted
             currentMap.setMyLocationEnabled(true);
@@ -108,7 +83,8 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
     public void onLocationResult(LocationResult locationResult) {
         for (Location location : locationResult.getLocations()) {
             System.out.println(location.toString());
-            fusedLocationClientOnSuccess(location);
+            setLocation(location);
+            currentMap.animateCamera(CameraUpdateFactory.newLatLng(getLastKnownLatLng()));
         }
     }
 

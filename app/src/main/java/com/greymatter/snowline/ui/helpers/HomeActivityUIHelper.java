@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -15,14 +14,12 @@ import android.widget.LinearLayout;
 import android.widget.Toolbar;
 
 import com.greymatter.snowline.Handlers.KeyboardVisibilityListener;
-import com.greymatter.snowline.Handlers.LinkGenerator;
-import com.greymatter.snowline.Handlers.RequestHandler;
+import com.greymatter.snowline.Objects.WTRequest;
+import com.greymatter.snowline.Handlers.WTRequestHandler;
 import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.DataParsers.RouteParser;
-import com.greymatter.snowline.DataParsers.StopScheduleParser;
 import com.greymatter.snowline.Objects.Route;
 import com.greymatter.snowline.Objects.Stop;
-import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.R;
 import com.greymatter.snowline.ui.StopScheduleActivity;
 
@@ -31,9 +28,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-import static com.greymatter.snowline.app.Constants.HOME_ACTIVITY_HELPER;
-import static com.greymatter.snowline.app.Constants.STOP_SCHEDULE;
 
 public class HomeActivityUIHelper {
 
@@ -98,10 +92,10 @@ public class HomeActivityUIHelper {
 
     public static ArrayList<Route> getRoutes(Stop stop) {
         ArrayList<Route> routeArrayList = new ArrayList<>();
-        final LinkGenerator linkGenerator = new LinkGenerator();
-        linkGenerator.generateRoutesLink().apiKey().stop(stop.getNumber()).usage(Constants.USAGE_LONG);
+        final WTRequest WTRequest = new WTRequest();
+        WTRequest.generateRoutesLink().apiKey().stop(stop.getNumber()).usage(Constants.USAGE_LONG);
 
-        final StringBuilder stringBuilder = RequestHandler.makeRequest(linkGenerator);
+        final StringBuilder stringBuilder = WTRequestHandler.makeRequest(WTRequest);
 
         try {
             JSONObject result = new JSONObject(stringBuilder.toString());

@@ -30,7 +30,7 @@ public class StopsListAdapterR extends RecyclerView.Adapter<ListLineHolder> impl
         this.listClickListener = listener;
     }
 
-    public void updateLocalList(ArrayList list){
+    public void onNewDataAdded(ArrayList list){
         localList.clear();
         localList.addAll(list);
     }
@@ -66,5 +66,8 @@ public class StopsListAdapterR extends RecyclerView.Adapter<ListLineHolder> impl
 
     public void clear(){
         this.localList.clear();
+    }
+    public void notifyDatasetChanged() {
+        this.notifyDataSetChanged();
     }
 }

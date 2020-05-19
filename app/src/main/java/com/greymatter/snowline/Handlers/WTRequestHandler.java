@@ -2,6 +2,8 @@ package com.greymatter.snowline.Handlers;
 
 import android.util.Log;
 
+import com.greymatter.snowline.Objects.WTRequest;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,13 +12,8 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-public class RequestHandler {
-
-    public RequestHandler(){
-
-    }
-
-    public static StringBuilder makeRequest(final LinkGenerator linkGenerator){
+public class WTRequestHandler {
+    public static StringBuilder makeRequest(final WTRequest WTRequest){
         final Boolean isFetchComplete = new Boolean(false);
         final StringBuilder stringBuilder = new StringBuilder();
 
@@ -24,7 +21,7 @@ public class RequestHandler {
             @Override
             public void run() {
                 synchronized (isFetchComplete){
-                    stringBuilder.append(RequestHandler.makeRequestHelper(linkGenerator));
+                    stringBuilder.append(WTRequestHandler.makeRequestHelper(WTRequest));
                     isFetchComplete.notifyAll();
                 }
             }
@@ -40,14 +37,14 @@ public class RequestHandler {
        return null;
     }
 
-    public static String makeRequestHelper(LinkGenerator linkGenerator){
-        Log.v("RequestHandler",linkGenerator.getCurrentLink());
+    public static String makeRequestHelper(WTRequest WTRequest){
+        Log.v("RequestHandler", WTRequest.getCurrentLink());
         String inputLine = "";
         String sample = "";
 
         URL obj = null;
         try {
-            obj = new URL(linkGenerator.getCurrentLink());
+            obj = new URL(WTRequest.getCurrentLink());
         } catch (MalformedURLException e) {e.printStackTrace();}
 
         HttpURLConnection con = null;
@@ -78,7 +75,7 @@ public class RequestHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+            con.disconnect();
         } else {
             System.out.println("GET request didn't work");
         }

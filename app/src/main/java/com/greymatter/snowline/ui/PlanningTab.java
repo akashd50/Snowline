@@ -15,7 +15,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
-import androidx.recyclerview.widget.RecyclerView;
+
 import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
@@ -23,8 +23,6 @@ import static com.greymatter.snowline.app.Constants.*;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
-import com.greymatter.snowline.Objects.TypeCommon;
-import com.greymatter.snowline.ui.adapters.ScheduleListAdapterR;
 import com.greymatter.snowline.ui.adapters.SearchViewAdapter;
 import com.greymatter.snowline.ui.adapters.StopsListAdapterR;
 import com.greymatter.snowline.Handlers.MapHandler;
@@ -32,7 +30,7 @@ import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.ui.helpers.PlanningTabUIHelper;
 import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.Handlers.KeyboardVisibilityListener;
-import com.greymatter.snowline.Handlers.LinkGenerator;
+import com.greymatter.snowline.Objects.WTRequest;
 import com.greymatter.snowline.Handlers.Validator;
 import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.Objects.Vector;
@@ -49,11 +47,7 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     private Button dragView, findNearbyStops;
     private boolean searchBarHasFocus;
     private Vector translationDelta, locationBeforeAnim;
-    private LinkGenerator linkGenerator;
-    private RecyclerView planningTabListView;
-    private ScheduleListAdapterR scheduleListAdapter;
-    private StopsListAdapterR stopListAdapter;
-    private RecyclerView.LayoutManager layoutManager;
+    private WTRequest WTRequest;
     private SearchViewAdapter searchViewAdapter;
     private Handler dbQueryHandler;
     private MapHandler mapHandler;
@@ -101,6 +95,7 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
                 switch (v.getId()){
                     case R.id.planning_tab_find_nearby_stops:
                         if (mapHandler.getLastKnownLocation() != null) {
+                            PlanningTabNavigationalView.removeAllViews();
                             displayNearbyStops(500);
                             mapHandler.getCurrentMap().
                                     animateCamera(CameraUpdateFactory.newLatLng(mapHandler.getLastKnownLatLng()));
@@ -154,7 +149,7 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
                 if(hasFocus){
                     if(!searchBarHasFocus) {
 
-                        planningTabListView.setAdapter(scheduleListAdapter);
+                        //planningTabListView.setAdapter(scheduleListAdapter);
 
                         searchBarHasFocus = true;
                         Log.v(PLANNING_TAB, "Focused Search bar");
@@ -340,11 +335,11 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     }
 
     public StopSchedule displayStopSchedule(String stopNumber){
-        linkGenerator = new LinkGenerator();
-        linkGenerator.generateStopScheduleLink(stopNumber).apiKey()
+        WTRequest = new WTRequest();
+        WTRequest.generateStopScheduleLink(stopNumber).apiKey()
                 .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
 
-        StopSchedule stopSchedule = PlanningTabUIHelper.fetchStopSchedule(linkGenerator);
+        StopSchedule stopSchedule = PlanningTabUIHelper.fetchStopSchedule(WTRequest);
         if(stopSchedule!=null) {
             PlanningTabNavigationalView.addView(stopSchedule.getRoutes(), null);
         }

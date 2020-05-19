@@ -3,29 +3,19 @@ package com.greymatter.snowline.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.greymatter.snowline.Objects.RouteVariant;
-import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.Objects.TypeCommon;
-import com.greymatter.snowline.Objects.Vector;
 import com.greymatter.snowline.R;
 import com.greymatter.snowline.ui.adapters.NavigationalViewAdapterR;
-import com.greymatter.snowline.ui.adapters.ScheduleListAdapterR;
-import com.greymatter.snowline.ui.adapters.StopsListAdapterR;
 import com.greymatter.snowline.app.Constants;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class PlanningTabNavigationalView {
     private static LinearLayout linearLayout;
@@ -66,6 +56,10 @@ public class PlanningTabNavigationalView {
         mainAdapter.onNewDataAdded(viewData, handler);
         currLayoutIndex++;
         next();
+    }
+
+    public static void removeAllViews() {
+        mainAdapter.removeAll();
     }
 
     private static int getCurrentItem(){

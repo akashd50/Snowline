@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:id="@+id/list_view_line"
     android:layout_columnWeight="3"
-    android:background="@drawable/schedule_list_line_background">
+    android:background="@drawable/list_line_background">
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -41,10 +41,10 @@
             android:layout_marginRight="10dp"
             android:layout_column="3"/>
     </TableRow>
-    <!--<TextView
-        android:id="@+id/route_info_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:background="@color/colorPrimary"/>-->
+    <View
+        android:id="@+id/schedule_format_divider_i"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_white"
+        android:layout_marginTop="15dp"/>
 </TableLayout>

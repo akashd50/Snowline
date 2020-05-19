@@ -25,6 +25,10 @@ android {
         }
     }
 
+    packagingOptions {
+        exclude 'META-INF/NOTICE.md'
+    }
+
 }
 
 dependencies {
@@ -45,4 +49,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
+    implementation group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.1.1'
+    /*implementation group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '3.0.0-M1'
+    implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '3.0.0-M1'*/
+    implementation group: 'org.glassfish', name: 'javax.xml.bind', version: '10.0-b28'
 }

@@ -1,62 +1,60 @@
-package com.greymatter.snowline.Handlers;
+package com.greymatter.snowline.Objects;
 
 import com.greymatter.snowline.app.Constants;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class LinkGenerator {
-
-
+public class WTRequest {
     private String currentLink;
-    public LinkGenerator(){
+    public WTRequest(){
         currentLink = "";
     }
 
-    public LinkGenerator generateStopScheduleLink (String stopNumber){
+    public WTRequest generateStopScheduleLink (String stopNumber){
         this.updateCurrentLink(Constants.BASE_ADDRESS + "/v3/stops/"+ stopNumber + "/schedule.json");
         return this;
     }
 
-    public LinkGenerator apiKey () {
+    public WTRequest apiKey () {
         this.updateCurrentLink("?api-key="+Constants.API_KEY);
         return this;
     }
 
-    public LinkGenerator generateStopLink () {
+    public WTRequest generateStopLink () {
         this.updateCurrentLink(Constants.BASE_ADDRESS + "/v3/stops.json");
         return this;
     }
 
-    public LinkGenerator generateRoutesLink () {
+    public WTRequest generateRoutesLink () {
         this.updateCurrentLink(Constants.BASE_ADDRESS + "/v3/routes.json");
         return this;
     }
 
-    public LinkGenerator stop(String stop) {
+    public WTRequest stop(String stop) {
         this.updateCurrentLink("&stop="+stop);
         return this;
     }
 
-    public LinkGenerator latLon (String lat, String lon) {
+    public WTRequest latLon (String lat, String lon) {
         this.updateCurrentLink("&lat="+lat+"&lon="+lon);
         return this;
     }
 
-    public LinkGenerator distance (String distance) {
+    public WTRequest distance (String distance) {
         this.updateCurrentLink("&distance="+distance);
         return this;
     }
 
 
 
-    public LinkGenerator usage(int usage){
+    public WTRequest usage(int usage){
         if(usage==Constants.USAGE_LONG) this.updateCurrentLink("&usage=long");
         else if(usage==Constants.USAGE_SHORT) this.updateCurrentLink("&usage=short");
         return this;
     }
 
-    public LinkGenerator addTime (LocalDateTime dateTime) {
+    public WTRequest addTime (LocalDateTime dateTime) {
         this.updateCurrentLink("&start="+ dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         return this;
     }

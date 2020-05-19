@@ -14,7 +14,6 @@ import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.Objects.TypeCommon;
 import com.greymatter.snowline.R;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -51,6 +50,16 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
         localListeners.remove(toRemove.toString());
         localAdapters.remove(toRemove.toString());
         localViews.remove(toRemove.toString());
+        this.notifyDataSetChanged();
+    }
+
+    public void removeAll() {
+        localList.clear();
+        localHandlers.clear();
+        localListeners.clear();
+        localAdapters.clear();
+        localViews.clear();
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -95,7 +104,7 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
             }
 
             view.setAdapter(adapterR);
-            adapterR.updateLocalList(localList.get(position));
+            adapterR.onNewDataAdded(localList.get(position));
             adapterR.notifyDataSetChanged();
             localViews.put(currentList.toString(), view);
 
@@ -117,7 +126,7 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
             }
 
             view.setAdapter(adapterR);
-            adapterR.updateLocalList(localList.get(position));
+            adapterR.onNewDataAdded(localList.get(position));
             adapterR.notifyDataSetChanged();
             localViews.put(currentList.toString(), view);
         }
@@ -145,4 +154,6 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
     public void clear(){
         localList.clear();
     }
+
+    //https://maps.googleapis.com/maps/api/directions/json?origin=49.8515,-97.1788&destination=49.8399,-97.1522&senson=false&mode=driving
 }

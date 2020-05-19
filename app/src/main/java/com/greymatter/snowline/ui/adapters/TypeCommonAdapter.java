@@ -1,5 +1,9 @@
 package com.greymatter.snowline.ui.adapters;
 
-public interface TypeCommonAdapter {
+import java.util.ArrayList;
 
+public interface TypeCommonAdapter {
+    void onNewDataAdded(ArrayList list);
+    void notifyDatasetChanged();
+    void clear();
 }

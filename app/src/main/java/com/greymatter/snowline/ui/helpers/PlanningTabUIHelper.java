@@ -13,9 +13,9 @@ import com.greymatter.snowline.Data.database.StopDBHelper;
 import com.greymatter.snowline.Data.entities.StopEntity;
 import com.greymatter.snowline.DataParsers.StopParser;
 import com.greymatter.snowline.DataParsers.StopScheduleParser;
-import com.greymatter.snowline.Handlers.LinkGenerator;
+import com.greymatter.snowline.Objects.WTRequest;
 import com.greymatter.snowline.Handlers.MapHandler;
-import com.greymatter.snowline.Handlers.RequestHandler;
+import com.greymatter.snowline.Handlers.WTRequestHandler;
 import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.Objects.TypeCommon;
@@ -75,12 +75,12 @@ public class PlanningTabUIHelper {
 
     public static ArrayList<TypeCommon> getNearbyStops(Location location, int radius){
         ArrayList<TypeCommon> nearbyStops = new ArrayList<>();
-        final LinkGenerator linkGenerator = new LinkGenerator();
-        linkGenerator.generateStopLink().apiKey()
+        final WTRequest WTRequest = new WTRequest();
+        WTRequest.generateStopLink().apiKey()
                 .latLon(location.getLatitude()+"", location.getLongitude()+"")
                 .distance(radius+"");
 
-        final StringBuilder stringBuilder = RequestHandler.makeRequest(linkGenerator);
+        final StringBuilder stringBuilder = WTRequestHandler.makeRequest(WTRequest);
 
         try {
             JSONObject result = new JSONObject(stringBuilder.toString());
@@ -107,11 +107,11 @@ public class PlanningTabUIHelper {
         }
     }
 
-    public static StopSchedule fetchStopSchedule(LinkGenerator linkGenerator){
+    public static StopSchedule fetchStopSchedule(WTRequest WTRequest){
 
         Log.v(HOME_ACTIVITY_HELPER, "Fetching schedule information");
 
-        String json = RequestHandler.makeRequest(linkGenerator).toString();
+        String json = WTRequestHandler.makeRequest(WTRequest).toString();
         StopSchedule stopSchedule = null;
         try {
             stopSchedule = StopScheduleParser.parse(new JSONObject(json)

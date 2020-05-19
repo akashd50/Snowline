@@ -22,7 +22,7 @@ public class ScheduleListAdapterR extends RecyclerView.Adapter<ListLineHolder> i
         localList = new ArrayList<>();
     }
 
-    public void updateLocalList(ArrayList list){
+    public void onNewDataAdded(ArrayList list){
         localList.clear();
         localList.addAll(list);
     }
@@ -65,5 +65,8 @@ public class ScheduleListAdapterR extends RecyclerView.Adapter<ListLineHolder> i
 
     public void clear(){
         this.localList.clear();
+    }
+    public void notifyDatasetChanged() {
+        this.notifyDataSetChanged();
     }
 }
