@@ -3,12 +3,14 @@ package com.greymatter.snowline.app;
 import android.app.Activity;
 import android.util.DisplayMetrics;
 
+import com.greymatter.snowline.BuildConfig;
+
 public class Constants {
     public static final String BASE_ADDRESS = "https://api.winnipegtransit.com";
     public static final String ORS_GEO_JSON_BASE = "https://api.openrouteservice.org/v2/directions/driving-car/geojson";
     public static final String ORS_JSON_BASE = "https://api.openrouteservice.org/v2/directions/driving-car/json";
-    public static final String API_KEY = "8G55aku8pgETTxnuI5N";
-    public static final String ORS_API_KEY = "5b3ce3597851110001cf6248481900f712fd4014bc93532a2fb44530";
+    public static final String API_KEY = BuildConfig.WT_API_KEY;
+    public static final String ORS_API_KEY = BuildConfig.ORS_API_KEY;
     public static final int USAGE_SHORT = 1001;
     public static final int USAGE_LONG = 1002;
     public static final int SUCCESS = 1;

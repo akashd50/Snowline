@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+def apikeyPropertiesFile = rootProject.file("apikey.properties")
+def apikeyProperties = new Properties()
+apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -17,6 +21,9 @@ android {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
+
+        buildConfigField("String", "WT_API_KEY", apikeyProperties['WT_API_KEY'])
+        buildConfigField("String", "ORS_API_KEY", apikeyProperties['ORS_API_KEY'])
     }
     buildTypes {
         release {
@@ -25,9 +32,6 @@ android {
         }
     }
 
-    packagingOptions {
-        exclude 'META-INF/NOTICE.md'
-    }
 
 }
 

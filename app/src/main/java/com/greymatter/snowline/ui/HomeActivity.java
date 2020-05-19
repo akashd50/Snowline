@@ -39,6 +39,7 @@ public class HomeActivity extends FragmentActivity{
 
         setUpUIElements();
         setUpOnTouchEventListener();
+
     }
 
     @Override
