@@ -3,8 +3,8 @@ package com.greymatter.snowline.ui.helpers;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Handler;
 import android.util.Log;
-
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -13,6 +13,8 @@ import com.greymatter.snowline.Data.database.StopDBHelper;
 import com.greymatter.snowline.Data.entities.StopEntity;
 import com.greymatter.snowline.DataParsers.StopParser;
 import com.greymatter.snowline.DataParsers.StopScheduleParser;
+import com.greymatter.snowline.Objects.ORSDirection;
+import com.greymatter.snowline.Objects.RouteVariant;
 import com.greymatter.snowline.Objects.WTRequest;
 import com.greymatter.snowline.Handlers.MapHandler;
 import com.greymatter.snowline.Handlers.WTRequestHandler;
@@ -21,12 +23,13 @@ import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.Objects.TypeCommon;
 import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.app.Services;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import static com.greymatter.snowline.app.Constants.HOME_ACTIVITY_HELPER;
 import static com.greymatter.snowline.app.Constants.STOP_SCHEDULE;
@@ -36,6 +39,10 @@ public class PlanningTabUIHelper {
 
     public static void init(Context context) {
         stopDBHelper = new StopDBHelper(Services.getDatabase(context));
+    }
+
+    public static void getSimilar(String text, Handler handler) {
+        stopDBHelper.getSimilar(text, handler);
     }
 
     public static void updateMap(MapHandler mapHandler, int distance, ArrayList<Stop> stopList){
@@ -56,28 +63,60 @@ public class PlanningTabUIHelper {
         }
     }
 
-    public static void findNearbyStops(String address) {
-        //ArrayList<Stop> nearbyStops = HomeActivityHelper.getNearbyStops(mapHandler.getLastKnownLocation(), distance);
+    public static ArrayList<Stop> getRouteStops(RouteVariant routeVariant){
+        ArrayList<Stop> routeStopsList = new ArrayList<>();
 
+        WTRequest request = new WTRequest();
+        request = request.base().v3().stops().asJson().route(routeVariant.getNumber());
+        StringBuilder response = WTRequestHandler.makeRequest(request);
 
+        try {
+            JSONObject root = new JSONObject(response.toString());
+            JSONArray stopsList = root.getJSONArray(Constants.STOPS);
+            for(int i=0;i<50;i++) {
+                JSONObject stop = stopsList.getJSONObject(i);
+                Stop currentStop = StopParser.parse(stop);
+                routeStopsList.add(currentStop);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-//        mapHandler.getCurrentMap().setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-//            @Override
-//            public boolean onMarkerClick(Marker marker) {
-//                AlertDialog stopInfoDialog = HomeActivityHelper.generateStopDialog(
-//                        (Stop)marker.getTag(),parentActivity,
-//                        HomeActivityHelper.getRoutes(((Stop)marker.getTag())));
-//                stopInfoDialog.show();
-//                return false;
-//            }
-//        });
+        return routeStopsList;
+    }
+
+    public static ORSDirection getDrawableRoute(RouteVariant variant) {
+        ArrayList<Stop> routeStops = getRouteStops(variant);
+
+        Comparator<Stop> stopComparator = new Comparator<Stop>() {
+            @Override
+            public int compare(Stop o1, Stop o2) {
+                return Integer.parseInt(o1.getNumber()) - Integer.parseInt(o2.getNumber());
+            }
+        };
+        routeStops.sort(stopComparator);
+        System.out.println(routeStops);
+        /*ORSDirection direction = null;
+        Log.v("Stops List Size", routeStops.size()+"");
+
+        ORSRequest request = new ORSRequest();
+        request = request.asGeoJson().addAllCoordinates(routeStops);
+
+        StringBuilder response = ORSRequestHandler.makeRequest(request);
+
+        try {
+            direction = ORSDirectionsParser.parse(new JSONObject(response.toString()));
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }*/
+        //return direction;
+        return null;
     }
 
     public static ArrayList<TypeCommon> getNearbyStops(Location location, int radius){
         ArrayList<TypeCommon> nearbyStops = new ArrayList<>();
         final WTRequest WTRequest = new WTRequest();
-        WTRequest.generateStopLink().apiKey()
-                .latLon(location.getLatitude()+"", location.getLongitude()+"")
+        WTRequest.base().v3().stops().asJson().latLon(location.getLatitude()+"", location.getLongitude()+"")
                 .distance(radius+"");
 
         final StringBuilder stringBuilder = WTRequestHandler.makeRequest(WTRequest);
@@ -107,11 +146,14 @@ public class PlanningTabUIHelper {
         }
     }
 
-    public static StopSchedule fetchStopSchedule(WTRequest WTRequest){
+    public static StopSchedule fetchStopSchedule(String stopNumber){
+        WTRequest request = new WTRequest();
+        request.base().v3().stops().add(stopNumber).schedule().asJson().addTime(
+                LocalDateTime.now()).usage(Constants.USAGE_LONG);
 
         Log.v(HOME_ACTIVITY_HELPER, "Fetching schedule information");
 
-        String json = WTRequestHandler.makeRequest(WTRequest).toString();
+        String json = WTRequestHandler.makeRequest(request).toString();
         StopSchedule stopSchedule = null;
         try {
             stopSchedule = StopScheduleParser.parse(new JSONObject(json)
@@ -120,5 +162,49 @@ public class PlanningTabUIHelper {
             e.printStackTrace();
         }
         return stopSchedule;
+    }
+
+    public static void fetchSimilarStops(final String query, final Handler handler) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                WTRequest request = new WTRequest();
+                request.base().v3().stops().wildcard(query).asJson();
+                String response = WTRequestHandler.makeRequest(request).toString();
+
+                try{
+                    ArrayList<Stop> similarStops = new ArrayList<>();
+                    JSONArray stops = new JSONObject(response).getJSONArray(Constants.STOPS);
+                    for(int i=0;i<stops.length();i++) {
+                        similarStops.add(StopParser.parse(stops.getJSONObject(i)));
+                    }
+
+                    if(similarStops.size()>0) {
+                        handler.obtainMessage(Constants.SUCCESS, similarStops).sendToTarget();
+                    }else {
+                        handler.obtainMessage(Constants.FAIL, similarStops).sendToTarget();
+                    }
+                }catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public static ArrayList<Stop> fetchSimilarStops(final String query) {
+        ArrayList<Stop> similarStops = new ArrayList<>();
+        WTRequest request = new WTRequest();
+        request.base().v3().stops().wildcard(query).asJson();
+        String response = WTRequestHandler.makeRequest(request).toString();
+
+        try{
+            JSONArray stops = new JSONObject(response).getJSONArray(Constants.STOPS);
+            for(int i=0;i<stops.length();i++) {
+                similarStops.add(StopParser.parse(stops.getJSONObject(i)));
+            }
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return similarStops;
     }
 }

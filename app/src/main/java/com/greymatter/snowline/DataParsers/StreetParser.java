@@ -12,7 +12,18 @@ public class StreetParser extends JSONParser {
         try {
             street.setKey(object.getString(KEY));
             street.setName(object.getString(NAME));
-            street.setName(object.getString(TYPE));
+            //street.setName(object.getString(TYPE));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return street;
+    }
+
+    public static Street parseCrossStreet(JSONObject object){
+        Street street = new Street();
+        try {
+            street.setKey(object.getString(KEY));
+            street.setName(object.getString(NAME));
         } catch (JSONException e) {
             e.printStackTrace();
         }

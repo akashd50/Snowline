@@ -76,8 +76,7 @@ public class StopScheduleActivity extends AppCompatActivity {
 
     private void fetchStopSchedule(String stopNumber){
         WTRequest = new WTRequest();
-        WTRequest.generateStopScheduleLink(stopNumber).apiKey()
-                .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
+        WTRequest.base().v3().stops().add(stopNumber).schedule().asJson().addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
         Log.v(TAG, "Fetching schedule information");
 
         String json = WTRequestHandler.makeRequest(WTRequest).toString();

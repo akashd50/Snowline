@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.cursoradapter.widget.CursorAdapter;
 
+import com.greymatter.snowline.R;
 import com.greymatter.snowline.app.Constants;
 
 public class SearchViewAdapter extends CursorAdapter {
@@ -47,8 +48,8 @@ public class SearchViewAdapter extends CursorAdapter {
             isDirty = false;
         }
 
-        View v = ((LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).
-                inflate(android.R.layout.simple_list_item_1, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).
+                inflate(R.layout.stop_format, parent, false);
         return v;
     }
 
@@ -62,8 +63,14 @@ public class SearchViewAdapter extends CursorAdapter {
 
         if(cursor!=null) {
             String stopNumber = cursor.getString(cursor.getColumnIndexOrThrow(Constants.DB_STOP_NUMBER));
-            TextView t1 = (TextView) view;
-            t1.setText(stopNumber);
+            String stopName = cursor.getString(cursor.getColumnIndexOrThrow(Constants.DB_STOP_NAME));
+            String stopDirections = cursor.getString(cursor.getColumnIndexOrThrow(Constants.DB_STOP_DIRECTION));
+
+            TextView stopNumT = view.findViewById(R.id.stop_format_stop_number);
+            TextView stopNameT = view.findViewById(R.id.stop_format_stop_name);
+
+            stopNumT.setText(stopNumber);
+            stopNameT.setText(stopName);
         }
     }
 

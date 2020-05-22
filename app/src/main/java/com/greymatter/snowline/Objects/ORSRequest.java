@@ -1,5 +1,7 @@
 package com.greymatter.snowline.Objects;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.greymatter.snowline.app.Constants;
 
@@ -24,6 +26,13 @@ public class ORSRequest {
         return this;
     }
 
+    public ORSRequest addAllCoordinates(ArrayList<Stop> stops) {
+        for(Stop stop : stops) {
+            this.routeCoordinates.add(stop.getCentre().getLatLng());
+        }
+        return this;
+    }
+
     public String getBaseAddress() {
         return baseAddress;
     }
@@ -33,10 +42,20 @@ public class ORSRequest {
     }
 
     public String routeCoordinatesAsJson() {
+        Log.v("Route Coords Size", routeCoordinates.size()+"");
+
         StringBuilder toReturn = new StringBuilder();
+        boolean first = true;
+        toReturn.append("[");
         for(LatLng latLng : routeCoordinates) {
-            toReturn.append("[" + latLng.latitude + ","+latLng.longitude + "]");
+            if(first) {
+                toReturn.append("[" + latLng.longitude + ","+latLng.latitude + "]");
+                first = false;
+            }else {
+                toReturn.append(",[" + latLng.longitude + ","+latLng.latitude + "]");
+            }
         }
+        toReturn.append("]");
         return toReturn.toString();
     }
 }

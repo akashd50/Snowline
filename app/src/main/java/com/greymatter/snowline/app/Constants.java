@@ -58,6 +58,10 @@ public class Constants {
     public static final String BIKE_RACK = "bike-rack";
     public static final String WIFI = "wifi";
 
+    public static final String FEATURES = "features";
+    public static final String GEOMTETRY = "geometry";
+    public static final String COORDINATES = "coordinates";
+
     //DB Constants
     public static final String DB_ID = "_id";
 

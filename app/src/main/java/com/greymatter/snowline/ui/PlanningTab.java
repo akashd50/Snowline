@@ -3,8 +3,10 @@ package com.greymatter.snowline.ui;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -23,6 +25,8 @@ import static com.greymatter.snowline.app.Constants.*;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
+import com.greymatter.snowline.Objects.RouteVariant;
+import com.greymatter.snowline.ui.adapters.ScheduleListAdapterR;
 import com.greymatter.snowline.ui.adapters.SearchViewAdapter;
 import com.greymatter.snowline.ui.adapters.StopsListAdapterR;
 import com.greymatter.snowline.Handlers.MapHandler;
@@ -30,13 +34,11 @@ import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.ui.helpers.PlanningTabUIHelper;
 import com.greymatter.snowline.app.Constants;
 import com.greymatter.snowline.Handlers.KeyboardVisibilityListener;
-import com.greymatter.snowline.Objects.WTRequest;
 import com.greymatter.snowline.Handlers.Validator;
 import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.Objects.Vector;
 import com.greymatter.snowline.R;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchListener{
@@ -47,10 +49,12 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     private Button dragView, findNearbyStops;
     private boolean searchBarHasFocus;
     private Vector translationDelta, locationBeforeAnim;
-    private WTRequest WTRequest;
     private SearchViewAdapter searchViewAdapter;
-    private Handler dbQueryHandler;
+    private Handler dbQueryHandler, wtSimilarStopsQueryHandler;
     private MapHandler mapHandler;
+    private double timeLastTextEntered;
+    private Thread textCheckThread;
+    private StringBuilder currentInput;
 
     public PlanningTab(final Context context, RelativeLayout planningTab, MapHandler mapHandler){
         this.context = context;
@@ -58,15 +62,16 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         this.mainLayout = planningTab;
         this.mapHandler = mapHandler;
         searchBarHasFocus = false;
-
+        currentInput = new StringBuilder();
         findViews();
 
         init();
         initButtonsListener();
         initSearchListeners();
         initSearchAdapters();
-        initDBListeners();
+        initCallBackHandlers();
 
+        PlanningTabUIHelper.init(context);
         PlanningTabNavigationalView.init(R.id.planning_tab_navigation_bar, context);
     }
 
@@ -112,12 +117,10 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.v(PLANNING_TAB, "OnQueryTextSubmit callback");
                 if(Validator.validateStopNumber(query)) {
                     Log.v("Logging DB Entries","------------------------------");
-
                     StopSchedule currSchedule = displayStopSchedule(query);
-                    PlanningTabUIHelper.addToDB(currSchedule.getStop());
+                    //PlanningTabUIHelper.addToDB(currSchedule.getStop());
                 }
                 if (searchBarHasFocus) {
                     searchBarHasFocus = false;
@@ -131,12 +134,44 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
             @Override
             public boolean onQueryTextChange(String newText) {
                 Log.v(PLANNING_TAB, "onQueryTextChange callback");
+
+                synchronized (currentInput) {
+                    currentInput.delete(0, currentInput.length());
+                    currentInput.append(newText);
+                }
+
                 if(!searchBarHasFocus){
                     searchBarHasFocus = true;
                     animateLayout(300, 0);
                 }
-
-                //stopDBHelper.getSimilar(newText, dbQueryHandler);
+                if(timeLastTextEntered == 0) {
+                    timeLastTextEntered = System.currentTimeMillis();
+                    textCheckThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            while(true) {
+                                synchronized (this) {
+                                    try {
+                                        wait(100);
+                                        synchronized (currentInput) {
+                                            if (System.currentTimeMillis() - timeLastTextEntered > 500) {
+                                                PlanningTabUIHelper.fetchSimilarStops(currentInput.toString(), wtSimilarStopsQueryHandler);
+                                                timeLastTextEntered = 0;
+                                                break;
+                                            }
+                                        }
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    textCheckThread.start();
+                }else{
+                    timeLastTextEntered = System.currentTimeMillis();
+                }
+                //PlanningTabUIHelper.getSimilar(newText, dbQueryHandler);
                 return false;
             }
         });
@@ -144,24 +179,14 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                Log.v(PLANNING_TAB, "onFocusChange callback");
-
                 if(hasFocus){
                     if(!searchBarHasFocus) {
-
-                        //planningTabListView.setAdapter(scheduleListAdapter);
-
                         searchBarHasFocus = true;
-                        Log.v(PLANNING_TAB, "Focused Search bar");
                         animateLayout(300, 0);
                     }
                 }else{
                     if(searchBarHasFocus){
                         searchBarHasFocus = false;
-                        Log.v(PLANNING_TAB, "Not Focused Search bar");
-
-                        Log.v(PLANNING_TAB, "Location Before Anim - "+ locationBeforeAnim.y);
-
                         animateLayout(300, locationBeforeAnim.y);
                     }
                 }
@@ -171,14 +196,12 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
             @Override
             public boolean onSuggestionSelect(int position) {
-                Log.v(PLANNING_TAB, "OnSuggestionListener: [select] "+ position);
                 //displayStopSchedule((String)searchViewAdapter.getItem(position));
                 return true;
             }
 
             @Override
             public boolean onSuggestionClick(int position) {
-                Log.v(PLANNING_TAB, "OnSuggestionListener: [click] "+ position);
                 displayStopSchedule(searchViewAdapter.getSuggestionText(position));
                 return true;
             }
@@ -186,15 +209,15 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     }
 
     private void initSearchAdapters(){
-        //final SearchManager searchManager = (SearchManager)context.getSystemService(Context.SEARCH_SERVICE);
-        //searchView.setSearchableInfo(searchManager.getSearchableInfo(((Activity) context).getComponentName()));
+        final SearchManager searchManager = (SearchManager)context.getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(((Activity) context).getComponentName()));
         searchViewAdapter = new SearchViewAdapter(context, null, false);
         searchView.setSuggestionsAdapter(searchViewAdapter);
 
         searchView.setQueryHint("enter stop number or address..");
     }
 
-    private void initDBListeners(){
+    private void initCallBackHandlers(){
         dbQueryHandler = new Handler(Looper.myLooper()){
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -206,6 +229,21 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
                 }else{
                     searchViewAdapter.swapCursor(null);
                 }
+            }
+        };
+
+        wtSimilarStopsQueryHandler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                ArrayList<Stop> similarStops = (ArrayList<Stop>)msg.obj;
+                String[] STOP_COLUMNS = {"_id", DB_STOP_NAME, DB_STOP_NUMBER, DB_STOP_DIRECTION};
+                MatrixCursor cursor = new MatrixCursor(STOP_COLUMNS, similarStops.size());
+                for(Stop s: similarStops) {
+                    cursor.addRow(s.toArray());
+                }
+
+                if(similarStops.size()>0) searchViewAdapter.swapCursor(cursor);
+                else searchViewAdapter.swapCursor(null);
             }
         };
     }
@@ -335,13 +373,26 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     }
 
     public StopSchedule displayStopSchedule(String stopNumber){
-        WTRequest = new WTRequest();
-        WTRequest.generateStopScheduleLink(stopNumber).apiKey()
-                .addTime(LocalDateTime.now()).usage(Constants.USAGE_LONG);
 
-        StopSchedule stopSchedule = PlanningTabUIHelper.fetchStopSchedule(WTRequest);
+
+        @SuppressLint("HandlerLeak")
+        Handler handler = new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                View v = (View)msg.obj;
+                Log.v(PLANNING_TAB, "Route On Click");
+                int itemPosition = PlanningTabNavigationalView.getCurrentView().getChildLayoutPosition(v);
+                RouteVariant routeSelected = ((ScheduleListAdapterR)PlanningTabNavigationalView.getNavViewAdapter().getAdapter(PlanningTabNavigationalView.getCurrentIndex())).getItem(itemPosition);
+                if(routeSelected!=null){
+                    //mapHandler.drawRouteOnMap(PlanningTabUIHelper.getDrawableRoute(routeSelected));
+                    PlanningTabUIHelper.getDrawableRoute(routeSelected);
+                }
+            }
+        };
+
+        StopSchedule stopSchedule = PlanningTabUIHelper.fetchStopSchedule(stopNumber);
         if(stopSchedule!=null) {
-            PlanningTabNavigationalView.addView(stopSchedule.getRoutes(), null);
+            PlanningTabNavigationalView.addView(stopSchedule.getRoutes(), handler);
         }
         return stopSchedule;
     }

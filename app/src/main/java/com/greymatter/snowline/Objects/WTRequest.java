@@ -11,51 +11,85 @@ public class WTRequest {
         currentLink = "";
     }
 
-    public WTRequest generateStopScheduleLink (String stopNumber){
-        this.updateCurrentLink(Constants.BASE_ADDRESS + "/v3/stops/"+ stopNumber + "/schedule.json");
+    public WTRequest apiKey () {
+        this.update("?api-key="+Constants.API_KEY);
         return this;
     }
 
-    public WTRequest apiKey () {
-        this.updateCurrentLink("?api-key="+Constants.API_KEY);
+    public WTRequest v3() {
+        this.update("/v3");
+        return this;
+    }
+
+    public WTRequest base() {
+        this.update(Constants.BASE_ADDRESS);
+        return this;
+    }
+
+    public WTRequest stops() {
+        this.update("/stops");
+        return this;
+    }
+
+    public WTRequest schedule() {
+        this.update("/schedule");
+        return this;
+    }
+
+    public WTRequest asJson() {
+        this.update(".json");
+        this.apiKey();
+        return this;
+    }
+
+    public WTRequest wildcard(String query) {
+        this.update(":"+query);
+        return this;
+    }
+
+    public WTRequest generateStopScheduleLink (String stopNumber){
+        this.update(Constants.BASE_ADDRESS + "/v3/stops/"+ stopNumber + "/schedule.json");
         return this;
     }
 
     public WTRequest generateStopLink () {
-        this.updateCurrentLink(Constants.BASE_ADDRESS + "/v3/stops.json");
+        this.update(Constants.BASE_ADDRESS + "/v3/stops.json");
         return this;
     }
 
     public WTRequest generateRoutesLink () {
-        this.updateCurrentLink(Constants.BASE_ADDRESS + "/v3/routes.json");
+        this.update(Constants.BASE_ADDRESS + "/v3/routes.json");
         return this;
     }
 
     public WTRequest stop(String stop) {
-        this.updateCurrentLink("&stop="+stop);
+        this.update("&stop="+stop);
+        return this;
+    }
+
+    public WTRequest route(String route) {
+        this.update("&route="+route);
         return this;
     }
 
     public WTRequest latLon (String lat, String lon) {
-        this.updateCurrentLink("&lat="+lat+"&lon="+lon);
+        this.update("&lat="+lat+"&lon="+lon);
         return this;
     }
 
     public WTRequest distance (String distance) {
-        this.updateCurrentLink("&distance="+distance);
+        this.update("&distance="+distance);
         return this;
     }
 
-
-
     public WTRequest usage(int usage){
-        if(usage==Constants.USAGE_LONG) this.updateCurrentLink("&usage=long");
-        else if(usage==Constants.USAGE_SHORT) this.updateCurrentLink("&usage=short");
+        if(usage==Constants.USAGE_LONG) this.update("&usage=long");
+        else if(usage==Constants.USAGE_SHORT) this.update("&usage=short");
         return this;
     }
 
     public WTRequest addTime (LocalDateTime dateTime) {
-        this.updateCurrentLink("&start="+ dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        this.update("&start="+ dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         return this;
     }
 
@@ -63,7 +97,12 @@ public class WTRequest {
         return currentLink;
     }
 
-    private void updateCurrentLink(String currentLink) {
+    private void update(String currentLink) {
         this.currentLink += currentLink;
+    }
+
+    public WTRequest add(String currentLink) {
+        this.update("/"+currentLink);
+        return this;
     }
 }

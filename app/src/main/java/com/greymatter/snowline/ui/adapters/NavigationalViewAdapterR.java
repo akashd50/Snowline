@@ -97,7 +97,7 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
             }
 
             if(position >= localAdapters.size()) {
-                adapterR = new ScheduleListAdapterR();
+                adapterR = new ScheduleListAdapterR(listener);
                 localAdapters.put(currentList.toString(), adapterR);
             }else{
                 adapterR = (ScheduleListAdapterR)localAdapters.get(currentList.toString());
@@ -154,6 +154,4 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
     public void clear(){
         localList.clear();
     }
-
-    //https://maps.googleapis.com/maps/api/directions/json?origin=49.8515,-97.1788&destination=49.8399,-97.1522&senson=false&mode=driving
 }

@@ -17,9 +17,13 @@ import java.util.ArrayList;
 
 public class ScheduleListAdapterR extends RecyclerView.Adapter<ListLineHolder> implements TypeCommonAdapter {
     private ArrayList<RouteVariant> localList;
-
+    private View.OnClickListener listener;
     public ScheduleListAdapterR() {
         localList = new ArrayList<>();
+    }
+    public ScheduleListAdapterR(View.OnClickListener listener) {
+        localList = new ArrayList<>();
+        this.listener = listener;
     }
 
     public void onNewDataAdded(ArrayList list){
@@ -59,6 +63,7 @@ public class ScheduleListAdapterR extends RecyclerView.Adapter<ListLineHolder> i
     public ListLineHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.schedule_format, parent, false);
+        v.setOnClickListener(listener);
         ListLineHolder listLine = new ListLineHolder(v);
         return listLine;
     }

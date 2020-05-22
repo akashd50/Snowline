@@ -23,6 +23,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.greymatter.snowline.Objects.ORSDirection;
 import com.greymatter.snowline.R;
 
 public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocationButtonClickListener,
@@ -67,6 +69,10 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
             // Permission has already been granted
             currentMap.setMyLocationEnabled(true);
         }
+    }
+
+    public void drawRouteOnMap(ORSDirection direction) {
+        currentMap.addPolyline(new PolylineOptions().clickable(true).addAll(direction.getDrawableRoute()));
     }
 
     @Override

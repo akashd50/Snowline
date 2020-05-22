@@ -3,7 +3,7 @@ package com.greymatter.snowline.Objects;
 public class RouteVariant extends Route {
     private boolean cancelled;
     private Times timeinfo;
-    private String key, variantKey, variantName;
+    private String variantKey, variantName;
     private Bus busInfo;
 
     public RouteVariant(String rKey, String rName, String rNumber){super(rKey, rNumber, rName);}
@@ -39,14 +39,6 @@ public class RouteVariant extends Route {
 
     public void setTimeinfo(Times timeinfo) {
         this.timeinfo = timeinfo;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     public Bus getBusInfo() {

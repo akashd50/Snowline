@@ -1,5 +1,7 @@
 package com.greymatter.snowline.Objects;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class Centre {
     private String zone, utmX, utmY, latitude, longitude;
     public Centre(){}
@@ -38,6 +40,10 @@ public class Centre {
     public Centre setLatitude(String latitude) {
         this.latitude = latitude;
         return this;
+    }
+
+    public LatLng getLatLng() {
+        return new LatLng(Double.parseDouble(latitude),Double.parseDouble(longitude));
     }
 
     public String getLongitude() {

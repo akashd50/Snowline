@@ -1,8 +1,10 @@
 package com.greymatter.snowline.Handlers;
 
+import android.os.Handler;
 import android.util.Log;
 
 import com.greymatter.snowline.Objects.WTRequest;
+import com.greymatter.snowline.app.Constants;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,6 +37,17 @@ public class WTRequestHandler {
             }catch (InterruptedException e){}
         }
        return null;
+    }
+
+    public static void makeBackgroundRequest(final WTRequest WTRequest, final Handler handler){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String response = WTRequestHandler.makeRequestHelper(WTRequest);
+                handler.obtainMessage(Constants.SUCCESS, response);
+            }
+        });
+        thread.start();
     }
 
     public static String makeRequestHelper(WTRequest WTRequest){

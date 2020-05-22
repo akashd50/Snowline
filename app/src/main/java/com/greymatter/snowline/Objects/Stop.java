@@ -69,6 +69,11 @@ public class Stop implements TypeCommon {
         return this;
     }
 
+    public String[] toArray() {
+        String[] toReturn = {number, name, number, direction};
+        return toReturn;
+    }
+
     public String toString(){
         return "{ "+ this.name + ", "+ this.number + " }";
     }

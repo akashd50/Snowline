@@ -15,7 +15,7 @@ public class StopParser extends JSONParser {
             stop.setNumber(object.getString(NUMBER));
             stop.setDirection(object.getString(DIRECTION));
             stop.setStreet(StreetParser.parse(object.getJSONObject(STREET)));
-            stop.setCrossStreet(StreetParser.parse(object.getJSONObject(CROSS_STREET)));
+            stop.setCrossStreet(StreetParser.parseCrossStreet(object.getJSONObject(CROSS_STREET)));
             stop.setCentre(CentreParser.parse(object.getJSONObject(CENTER)));
         } catch (JSONException e) {
             e.printStackTrace();

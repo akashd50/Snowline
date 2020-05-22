@@ -68,7 +68,14 @@ public class ORSRequestHandler {
         con.setUseCaches( false );
 
         try(OutputStream os = con.getOutputStream()) {
-            byte[] input = ("{\"coordinates\":"+request.routeCoordinatesAsJson()+"}").getBytes("utf-8");
+            //[51.513069,-0.140784],[51.511106,-0.149796]
+            //"+request.routeCoordinatesAsJson()+"
+            String toWrite ="{\"coordinates\":"+request.routeCoordinatesAsJson()+"}";
+            Log.v("To write ", toWrite);
+            //Log.v("String Len", request.routeCoordinatesAsJson().length()+"");
+
+
+            byte[] input = toWrite.getBytes("utf-8");
             os.write(input, 0, input.length);
         }catch (IOException e){
             e.printStackTrace();
