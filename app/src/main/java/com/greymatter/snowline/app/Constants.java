@@ -17,6 +17,13 @@ public class Constants {
     public static final int FAIL = 0;
     public static final String DEFAULT_USER = "default_user";
 
+    //Maps constants
+    public static final float ZOOM_WORLD = 1;
+    public static final float ZOOM_LANDMASS = 5;
+    public static final float ZOOM_CITY = 10;
+    public static final float ZOOM_STREETS = 15;
+    public static final float ZOOM_BUILDINGS = 20;
+
     //Activity Tags
     public static final String HOME_ACTIVITY = "Home Activity: INFO";
     public static final String HOME_ACTIVITY_HELPER = "Home Activity Helper: INFO";

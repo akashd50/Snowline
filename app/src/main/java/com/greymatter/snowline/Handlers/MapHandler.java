@@ -17,15 +17,19 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.greymatter.snowline.Objects.ORSDirection;
 import com.greymatter.snowline.R;
+import com.greymatter.snowline.app.Constants;
 
 public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
@@ -37,12 +41,17 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
     private GoogleMap currentMap;
     private SupportMapFragment mapFragment;
     private Activity activity;
+    private boolean followUserLocation;
+    private float currentZoomLevel;
 
     public MapHandler(Activity activity, Context context, SupportMapFragment fragment){
         this.activity = activity;
         this.context = context;
-        mapFragment = fragment;
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
+        this.mapFragment = fragment;
+        this.currentZoomLevel = Constants.ZOOM_STREETS;
+        this.followUserLocation = true;
+        this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
+
         LocationRequest locationRequest = LocationRequest.create().setInterval(10000).setFastestInterval(5000).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         fusedLocationClient.requestLocationUpdates(locationRequest, this, Looper.getMainLooper());
     }
@@ -77,11 +86,13 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
 
     @Override
     public void onMyLocationClick(@NonNull Location location) {
-
+        setFollowUserLocation(true);
+        setCurrentZoomLevel(Constants.ZOOM_STREETS);
     }
 
     @Override
     public boolean onMyLocationButtonClick() {
+
         return false;
     }
 
@@ -90,8 +101,42 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
         for (Location location : locationResult.getLocations()) {
             System.out.println(location.toString());
             setLocation(location);
-            currentMap.animateCamera(CameraUpdateFactory.newLatLng(getLastKnownLatLng()));
+            if(followUserLocation()) {
+                animate(getLastKnownLatLng());
+            }
         }
+    }
+
+    public void animate(LatLng location) {
+        currentMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                CameraPosition.fromLatLngZoom(location, getCurrentZoomLevel())));
+    }
+
+    public boolean followUserLocation() {
+        return followUserLocation;
+    }
+
+    public void setFollowUserLocation(boolean followUserLocation) {
+        this.followUserLocation = followUserLocation;
+    }
+
+    public float getCurrentZoomLevel() {
+        return currentZoomLevel;
+    }
+
+    public void setCurrentZoomLevel(float currentZoomLevel) {
+        this.currentZoomLevel = currentZoomLevel;
+    }
+
+    public void clear() {
+        currentMap.clear();
+    }
+
+    public void addMarker(LatLng latLng, String title, Object tag) {
+        MarkerOptions marker = new MarkerOptions()
+                .position(latLng)
+                .title(title);
+        currentMap.addMarker(marker).setTag(tag);
     }
 
     @Override

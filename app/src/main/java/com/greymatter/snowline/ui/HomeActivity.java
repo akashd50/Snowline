@@ -53,6 +53,7 @@ public class HomeActivity extends FragmentActivity{
     }
 
 
+
     @Override
     protected void onStart() {
         mapFragment.onStart();
@@ -93,6 +94,12 @@ public class HomeActivity extends FragmentActivity{
     public void onLowMemory() {
         mapFragment.onLowMemory();
         super.onLowMemory();
+    }
+
+    @Override
+    public void onBackPressed() {
+        planningTab.onBackPressed();
+        super.onBackPressed();
     }
 
     private void setUpOnTouchEventListener(){

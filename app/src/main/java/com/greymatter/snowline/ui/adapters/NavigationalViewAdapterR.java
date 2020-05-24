@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.greymatter.snowline.Objects.Route;
 import com.greymatter.snowline.Objects.RouteVariant;
 import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.Objects.TypeCommon;
@@ -20,10 +21,12 @@ import java.util.HashMap;
 public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolder> {
     private Context context;
     private ArrayList<ArrayList<TypeCommon>> localList;
-    private HashMap<String, TypeCommonAdapter> localAdapters;
-    private HashMap<String, RecyclerView> localViews;
-    private HashMap<String, Handler> localHandlers;
-    private HashMap<String, View.OnClickListener> localListeners;
+    private HashMap<Integer, TypeCommonAdapter> localAdapters;
+    private HashMap<Integer, RecyclerView> localViews;
+    private HashMap<Integer, Handler> localHandlers;
+    private HashMap<Integer, View.OnClickListener> localListeners;
+    private HashMap<Integer, TypeCommon> listItemsTitleData;
+    private HashMap<Integer, ArrayList<ArrayList<Route>>> additionalStopsInfo;
     private View.OnClickListener navViewListener;
 
     public NavigationalViewAdapterR(Context context, View.OnClickListener listener) {
@@ -33,23 +36,31 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
         localViews = new HashMap<>();
         localHandlers = new HashMap<>();
         localListeners = new HashMap<>();
+        listItemsTitleData = new HashMap<>();
+        additionalStopsInfo = new HashMap<>();
         navViewListener = listener;
     }
 
-    public void onNewDataAdded(ArrayList<TypeCommon> list, Handler handler){
+    public void onNewDataAdded(ArrayList<TypeCommon> list, TypeCommon infoRelatedTo, Handler handler){
         localViews.clear();
-
+        listItemsTitleData.put(list.hashCode(), infoRelatedTo);
         localList.add(list);
-        localHandlers.put(list.toString(), handler);
+        localHandlers.put(list.hashCode(), handler);
         this.notifyDataSetChanged();
+    }
+
+    public void addAdditionalStopData(int hashCode, ArrayList<ArrayList<Route>> stopsRoutes) {
+        additionalStopsInfo.put(hashCode, stopsRoutes);
     }
 
     public void remove(int index) {
         ArrayList toRemove = localList.remove(index);
-        localHandlers.remove(toRemove.toString());
-        localListeners.remove(toRemove.toString());
-        localAdapters.remove(toRemove.toString());
-        localViews.remove(toRemove.toString());
+        localHandlers.remove(toRemove.hashCode());
+        localListeners.remove(toRemove.hashCode());
+        localAdapters.remove(toRemove.hashCode());
+        localViews.remove(toRemove.hashCode());
+        listItemsTitleData.remove(toRemove.hashCode());
+        additionalStopsInfo.remove(toRemove.hashCode());
         this.notifyDataSetChanged();
     }
 
@@ -59,6 +70,8 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
         localListeners.clear();
         localAdapters.clear();
         localViews.clear();
+        listItemsTitleData.clear();
+        additionalStopsInfo.clear();
         this.notifyDataSetChanged();
     }
 
@@ -72,11 +85,15 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
     }
 
     public TypeCommonAdapter getAdapter(int index) {
-        return localAdapters.get(localList.get(index).toString());
+        return localAdapters.get(localList.get(index).hashCode());
     }
 
     public RecyclerView getView(int index) {
-        return localViews.get(localList.get(index).toString());
+        return localViews.get(localList.get(index).hashCode());
+    }
+
+    public TypeCommon getTitleForView(int index) {
+        return listItemsTitleData.get(localList.get(index).hashCode());
     }
 
     @Override
@@ -90,45 +107,48 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
             ScheduleListAdapterR adapterR = null;
             View.OnClickListener listener = null;
             if(position >= localListeners.size()) {
-                listener = getNewListener(localHandlers.get(currentList.toString()));
-                localListeners.put(currentList.toString(), listener);
+                listener = getNewListener(localHandlers.get(currentList.hashCode()));
+                localListeners.put(currentList.hashCode(), listener);
             }else{
-                listener = localListeners.get(currentList.toString());
+                listener = localListeners.get(currentList.hashCode());
             }
 
             if(position >= localAdapters.size()) {
                 adapterR = new ScheduleListAdapterR(listener);
-                localAdapters.put(currentList.toString(), adapterR);
+                localAdapters.put(currentList.hashCode(), adapterR);
             }else{
-                adapterR = (ScheduleListAdapterR)localAdapters.get(currentList.toString());
+                adapterR = (ScheduleListAdapterR)localAdapters.get(currentList.hashCode());
             }
 
             view.setAdapter(adapterR);
             adapterR.onNewDataAdded(localList.get(position));
             adapterR.notifyDataSetChanged();
-            localViews.put(currentList.toString(), view);
+            localViews.put(currentList.hashCode(), view);
 
         }else if(localList.get(position).get(0) instanceof Stop) {
             StopsListAdapterR adapterR = null;
             View.OnClickListener listener = null;
             if(position >= localListeners.size()) {
-                listener = getNewListener(localHandlers.get(currentList.toString()));
-                localListeners.put(currentList.toString(), listener);
+                listener = getNewListener(localHandlers.get(currentList.hashCode()));
+                localListeners.put(currentList.hashCode(), listener);
             }else{
-                listener = localListeners.get(currentList.toString());
+                listener = localListeners.get(currentList.hashCode());
             }
 
             if(position >= localAdapters.size()) {
                 adapterR = new StopsListAdapterR(listener);
-                localAdapters.put(currentList.toString(), adapterR);
+                localAdapters.put(currentList.hashCode(), adapterR);
             }else{
-                adapterR = (StopsListAdapterR)localAdapters.get(currentList.toString());
+                adapterR = (StopsListAdapterR)localAdapters.get(currentList.hashCode());
             }
 
             view.setAdapter(adapterR);
             adapterR.onNewDataAdded(localList.get(position));
+            if(additionalStopsInfo.get(currentList.hashCode())!=null) {
+                adapterR.onNewDataAddedAddl(additionalStopsInfo.get(currentList.hashCode()));
+            }
             adapterR.notifyDataSetChanged();
-            localViews.put(currentList.toString(), view);
+            localViews.put(currentList.hashCode(), view);
         }
     }
 

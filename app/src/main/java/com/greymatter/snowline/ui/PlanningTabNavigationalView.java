@@ -6,11 +6,18 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.greymatter.snowline.Objects.Location;
+import com.greymatter.snowline.Objects.Route;
+import com.greymatter.snowline.Objects.RouteVariant;
+import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.Objects.TypeCommon;
 import com.greymatter.snowline.R;
 import com.greymatter.snowline.ui.adapters.NavigationalViewAdapterR;
@@ -22,6 +29,7 @@ public class PlanningTabNavigationalView {
     private static LinearLayoutManager mainRecyclerViewLayoutManager;
     private static RecyclerView mainRecyclerView;
     private static NavigationalViewAdapterR mainAdapter;
+    private static TextView navigationalViewTitle;
     private static View.OnClickListener mainListener;
     private static ArrayList<ArrayList<TypeCommon>> data;
     private static int currLayoutIndex = -1;
@@ -29,6 +37,8 @@ public class PlanningTabNavigationalView {
     public static void init(int layoutID, Context ctx) {
         linearLayout = ((Activity) ctx).findViewById(layoutID);
         mainRecyclerView = ((Activity) ctx).findViewById(R.id.nav_bar_rec_view);
+        navigationalViewTitle = ((Activity) ctx).findViewById(R.id.planning_tab_navigation_bar_context_title);
+
         mainRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mainRecyclerViewLayoutManager = new LinearLayoutManager(ctx, RecyclerView.HORIZONTAL, false);
         mainRecyclerView.setLayoutManager(mainRecyclerViewLayoutManager);
@@ -38,7 +48,16 @@ public class PlanningTabNavigationalView {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 currLayoutIndex = getCurrentItem();
-                Log.v(Constants.NAV_TAB, "onScrolled: Current Index => "+ currLayoutIndex);
+                TypeCommon titleObj = getNavViewAdapter().getTitleForView(currLayoutIndex);
+                String toDisplay = "";
+                if(titleObj instanceof Location) {
+                    toDisplay = ((Location)titleObj).toString();
+                }else if(titleObj instanceof Stop) {
+                    toDisplay = "Routes for "+ ((Stop)titleObj).getName();
+                }else if(titleObj instanceof RouteVariant) {
+                    toDisplay = "Bus info for "+ ((RouteVariant)titleObj).getVariantName();
+                }
+                navigationalViewTitle.setText(toDisplay);
             }
         });
 
@@ -48,18 +67,23 @@ public class PlanningTabNavigationalView {
         data = new ArrayList<>();
     }
 
-    public static void addView(ArrayList<TypeCommon> viewData, Handler handler) {
+    public static void addView(ArrayList<TypeCommon> viewData, TypeCommon infoRelatedTo, Handler handler) {
         if(hasNext()){
             mainAdapter.remove(currLayoutIndex+1);
         }
         data.add(viewData);
-        mainAdapter.onNewDataAdded(viewData, handler);
+        mainAdapter.onNewDataAdded(viewData, infoRelatedTo, handler);
         currLayoutIndex++;
         next();
     }
 
+    public static void addAdditionalStopData(int hashCode, ArrayList<ArrayList<Route>> routes) {
+        mainAdapter.addAdditionalStopData(hashCode, routes);
+    }
+
     public static void removeAllViews() {
         mainAdapter.removeAll();
+        currLayoutIndex = -1;
     }
 
     private static int getCurrentItem(){
@@ -82,12 +106,6 @@ public class PlanningTabNavigationalView {
 
     public static int getCurrentIndex() {
         return currLayoutIndex;
-    }
-
-    public static void removeCurrentViewFromDisplay(){
-        if(currLayoutIndex>=0) {
-            //linearLayout.removeView(views.get(currLayoutIndex));
-        }
     }
 
     public static void next() {

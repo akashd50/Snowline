@@ -31,6 +31,11 @@ public class WTRequest {
         return this;
     }
 
+    public WTRequest routes() {
+        this.update("/routes");
+        return this;
+    }
+
     public WTRequest schedule() {
         this.update("/schedule");
         return this;
@@ -103,6 +108,11 @@ public class WTRequest {
 
     public WTRequest add(String currentLink) {
         this.update("/"+currentLink);
+        return this;
+    }
+
+    public WTRequest param(String param, String value) {
+        this.update("&"+param+"="+value);
         return this;
     }
 }

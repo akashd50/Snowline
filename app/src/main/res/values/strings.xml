@@ -13,4 +13,6 @@
     <string name="home_scr_menu_find_schedule_stop_num">Find Stop Schedule</string>
     <string name="home_scr_menu_find_nearby_stops">Find Nearby Stops</string>
 
+    <string name="schedule_adapter_bus_mins">%d mins</string>
+
 </resources>

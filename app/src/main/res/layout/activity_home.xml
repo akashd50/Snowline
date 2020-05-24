@@ -80,31 +80,37 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_below="@id/divider_ii">
-           <!-- <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/nav_bar_pager"
+
+            <TextView
+                android:id="@+id/planning_tab_navigation_bar_context_title"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />-->
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:text="Sample"
+                android:fontFamily="monospace"
+                android:textSize="@dimen/text_medium"
+                android:textColor="@color/color_white"
+                android:shadowColor="@color/color_white"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="3"
+                android:gravity="center_horizontal"/>
+
+            <View
+                android:id="@+id/divider_iii"
+                android:layout_width="100dp"
+                android:layout_height="10dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/stop_number_background"/>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/nav_bar_rec_view"
                 android:layout_width="match_parent"
-                android:orientation="horizontal"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                android:orientation="horizontal" />
 
         </LinearLayout>
-
-       <!-- <View
-            android:id="@+id/divider_iii"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_below="@id/planning_tab_navigation_bar"
-            android:background="@color/color_white"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/planning_tab_recycler_view"
-            android:background="@color/color_dark_navy_blue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/divider_iii"/>-->
     </RelativeLayout>
 
 

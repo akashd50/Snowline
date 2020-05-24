@@ -25,6 +25,8 @@ import static com.greymatter.snowline.app.Constants.*;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
+import com.greymatter.snowline.Handlers.InputHandler;
+import com.greymatter.snowline.Objects.Location;
 import com.greymatter.snowline.Objects.RouteVariant;
 import com.greymatter.snowline.ui.adapters.ScheduleListAdapterR;
 import com.greymatter.snowline.ui.adapters.SearchViewAdapter;
@@ -52,17 +54,22 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     private SearchViewAdapter searchViewAdapter;
     private Handler dbQueryHandler, wtSimilarStopsQueryHandler;
     private MapHandler mapHandler;
-    private double timeLastTextEntered;
-    private Thread textCheckThread;
-    private StringBuilder currentInput;
+    private InputHandler inputHandler;
 
     public PlanningTab(final Context context, RelativeLayout planningTab, MapHandler mapHandler){
         this.context = context;
         this.parentActivity = (Activity)context;
         this.mainLayout = planningTab;
         this.mapHandler = mapHandler;
+
         searchBarHasFocus = false;
-        currentInput = new StringBuilder();
+        inputHandler = new InputHandler(500, new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                Log.v("Running", "InputHandler");
+                PlanningTabUIHelper.fetchSimilarStops(((String)msg.obj), wtSimilarStopsQueryHandler);
+            }
+        });
         findViews();
 
         init();
@@ -134,44 +141,13 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
             @Override
             public boolean onQueryTextChange(String newText) {
                 Log.v(PLANNING_TAB, "onQueryTextChange callback");
-
-                synchronized (currentInput) {
-                    currentInput.delete(0, currentInput.length());
-                    currentInput.append(newText);
-                }
+                inputHandler.update(newText);
 
                 if(!searchBarHasFocus){
                     searchBarHasFocus = true;
                     animateLayout(300, 0);
                 }
-                if(timeLastTextEntered == 0) {
-                    timeLastTextEntered = System.currentTimeMillis();
-                    textCheckThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            while(true) {
-                                synchronized (this) {
-                                    try {
-                                        wait(100);
-                                        synchronized (currentInput) {
-                                            if (System.currentTimeMillis() - timeLastTextEntered > 500) {
-                                                PlanningTabUIHelper.fetchSimilarStops(currentInput.toString(), wtSimilarStopsQueryHandler);
-                                                timeLastTextEntered = 0;
-                                                break;
-                                            }
-                                        }
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-                    });
-                    textCheckThread.start();
-                }else{
-                    timeLastTextEntered = System.currentTimeMillis();
-                }
-                //PlanningTabUIHelper.getSimilar(newText, dbQueryHandler);
+
                 return false;
             }
         });
@@ -202,6 +178,12 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
 
             @Override
             public boolean onSuggestionClick(int position) {
+                Stop stopSelected = PlanningTabUIHelper.fetchStopInfo(searchViewAdapter.getSuggestionText(position));
+
+                mapHandler.clear();
+                mapHandler.addMarker(stopSelected.getCentre().getLatLng(), stopSelected.getName(), stopSelected);
+                mapHandler.setFollowUserLocation(false);
+
                 displayStopSchedule(searchViewAdapter.getSuggestionText(position));
                 return true;
             }
@@ -347,8 +329,9 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
         ArrayList nearbyStops = PlanningTabUIHelper.getNearbyStops(
                 mapHandler.getLastKnownLocation(), distance);
 
-        @SuppressLint("HandlerLeak")
-        Handler handler = new Handler(){
+        //ArrayList additionalInfo = PlanningTabUIHelper.fetchStopsRoutesInfo(nearbyStops);
+
+        Handler handler = new Handler(Looper.getMainLooper()){
             @Override
             public void handleMessage(@NonNull Message msg) {
                 View v = (View)msg.obj;
@@ -356,13 +339,19 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
                 int itemPosition = PlanningTabNavigationalView.getCurrentView().getChildLayoutPosition(v);
                 Stop stopSelected = ((StopsListAdapterR)PlanningTabNavigationalView.getNavViewAdapter().getAdapter(PlanningTabNavigationalView.getCurrentIndex())).getItem(itemPosition);
                 if(stopSelected!=null){
+                    //clear map
+                    mapHandler.clear();
+                    mapHandler.addMarker(stopSelected.getCentre().getLatLng(), stopSelected.getName(), stopSelected);
+                    mapHandler.setFollowUserLocation(false);
+
                     displayStopSchedule(stopSelected.getNumber());
                 }
             }
         };
 
-        PlanningTabNavigationalView.addView(nearbyStops, handler);
-        PlanningTabUIHelper.updateMap(mapHandler,distance, nearbyStops);
+        //PlanningTabNavigationalView.addAdditionalStopData(nearbyStops.hashCode(), additionalInfo);
+        PlanningTabNavigationalView.addView(nearbyStops, new Location(), handler);
+        PlanningTabUIHelper.updateMap(mapHandler, distance, nearbyStops);
         mapHandler.getCurrentMap().setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -373,10 +362,8 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
     }
 
     public StopSchedule displayStopSchedule(String stopNumber){
-
-
-        @SuppressLint("HandlerLeak")
-        Handler handler = new Handler(){
+        //show schedule
+        Handler handler = new Handler(Looper.getMainLooper()){
             @Override
             public void handleMessage(@NonNull Message msg) {
                 View v = (View)msg.obj;
@@ -390,10 +377,17 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
             }
         };
 
+        Stop stop = PlanningTabUIHelper.fetchStopInfo(stopNumber);
+        mapHandler.animate(stop.getCentre().getLatLng());
+
         StopSchedule stopSchedule = PlanningTabUIHelper.fetchStopSchedule(stopNumber);
         if(stopSchedule!=null) {
-            PlanningTabNavigationalView.addView(stopSchedule.getRoutes(), handler);
+            PlanningTabNavigationalView.addView(stopSchedule.getRoutes(), stop, handler);
         }
         return stopSchedule;
+    }
+
+    public void onBackPressed() {
+        inputHandler.onExit();
     }
 }
