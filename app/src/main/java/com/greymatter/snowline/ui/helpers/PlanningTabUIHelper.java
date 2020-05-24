@@ -7,10 +7,6 @@ import android.os.Handler;
 import android.util.Log;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.greymatter.snowline.Data.database.StopDBHelper;
-import com.greymatter.snowline.Data.entities.StopEntity;
 import com.greymatter.snowline.DataParsers.RouteParser;
 import com.greymatter.snowline.DataParsers.StopParser;
 import com.greymatter.snowline.DataParsers.StopScheduleParser;
@@ -24,28 +20,20 @@ import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.Objects.TypeCommon;
 import com.greymatter.snowline.app.Constants;
-import com.greymatter.snowline.app.Services;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
-
 import static com.greymatter.snowline.app.Constants.HOME_ACTIVITY_HELPER;
 import static com.greymatter.snowline.app.Constants.STOP;
 import static com.greymatter.snowline.app.Constants.STOP_SCHEDULE;
 
 public class PlanningTabUIHelper {
-    private static StopDBHelper stopDBHelper;
 
     public static void init(Context context) {
-        stopDBHelper = new StopDBHelper(Services.getDatabase(context));
-    }
 
-    public static void getSimilar(String text, Handler handler) {
-        stopDBHelper.getSimilar(text, handler);
     }
 
     public static void updateMap(MapHandler mapHandler, int distance, ArrayList<Stop> stopList){
@@ -130,19 +118,6 @@ public class PlanningTabUIHelper {
             e.printStackTrace();
         }
         return nearbyStops;
-    }
-
-    public static void addToDB(Stop stop){
-        final StopEntity stopEntity = new StopEntity();
-        if(stop!=null) {
-            stopEntity.key = Integer.parseInt(stop.getNumber());
-            stopEntity.stopName = stop.getName();
-            stopEntity.stopNumber = stop.getNumber();
-            stopEntity.direction = stop.getDirection();
-            if(!stopDBHelper.find(stop.getNumber())){
-                stopDBHelper.addStop(stopEntity);
-            }
-        }
     }
 
     public static StopSchedule fetchStopSchedule(String stopNumber){
