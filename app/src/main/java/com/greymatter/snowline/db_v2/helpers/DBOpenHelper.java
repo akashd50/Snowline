@@ -15,12 +15,14 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_TRIPS_TABLE);
-        db.execSQL(SQL_DELETE_SHAPES_TABLE);
+        db.execSQL(SQL_CREATE_SHAPES_TABLE);
+        db.execSQL(SQL_CREATE_GLOBAL_DATA_TABLE);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(SQL_DELETE_TRIPS_TABLE);
         db.execSQL(SQL_DELETE_SHAPES_TABLE);
+        db.execSQL(SQL_DELETE_GLOBAL_DATA_TABLE);
         onCreate(db);
     }
 

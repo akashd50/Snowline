@@ -53,9 +53,9 @@ public class PlanningTabNavigationalView {
                 if(titleObj instanceof Location) {
                     toDisplay = ((Location)titleObj).toString();
                 }else if(titleObj instanceof Stop) {
-                    toDisplay = "Routes for "+ ((Stop)titleObj).getName();
+                    toDisplay = ((Stop)titleObj).getName();
                 }else if(titleObj instanceof RouteVariant) {
-                    toDisplay = "Bus info for "+ ((RouteVariant)titleObj).getVariantName();
+                    toDisplay = ((RouteVariant)titleObj).getVariantName();
                 }
                 navigationalViewTitle.setText(toDisplay);
             }

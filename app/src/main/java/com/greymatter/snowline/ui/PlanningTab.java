@@ -371,8 +371,8 @@ public class PlanningTab implements KeyboardVisibilityListener, View.OnTouchList
                 int itemPosition = PlanningTabNavigationalView.getCurrentView().getChildLayoutPosition(v);
                 RouteVariant routeSelected = ((ScheduleListAdapterR)PlanningTabNavigationalView.getNavViewAdapter().getAdapter(PlanningTabNavigationalView.getCurrentIndex())).getItem(itemPosition);
                 if(routeSelected!=null){
-                    //mapHandler.drawRouteOnMap(PlanningTabUIHelper.getDrawableRoute(routeSelected));
-                    PlanningTabUIHelper.getDrawableRoute(routeSelected);
+                    mapHandler.drawRouteOnMap(PlanningTabUIHelper.getDrawableRoute(routeSelected));
+                    //PlanningTabUIHelper.getDrawableRoute(routeSelected);
                 }
             }
         };

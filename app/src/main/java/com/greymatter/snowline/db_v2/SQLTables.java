@@ -1,5 +1,6 @@
 package com.greymatter.snowline.db_v2;
 
+import com.greymatter.snowline.db_v2.contracts.GlobalDataContract.*;
 import com.greymatter.snowline.db_v2.contracts.TripsContract.*;
 import com.greymatter.snowline.db_v2.contracts.ShapesContract.*;
 
@@ -29,4 +30,15 @@ public class SQLTables {
 
     public static final String SQL_DELETE_SHAPES_TABLE =
             "DROP TABLE IF EXISTS " + TripsEntry.TABLE_NAME;
+
+    public static final String SQL_CREATE_GLOBAL_DATA_TABLE =
+            "CREATE TABLE " + GlobalDataEntry.TABLE_NAME + " (" +
+                    GlobalDataEntry._ID + " INTEGER PRIMARY KEY," +
+                    GlobalDataEntry.C_TRIPS_TABLE_ID + " TEXT," +
+                    GlobalDataEntry.C_SHAPES_TABLE_ID + " TEXT," +
+                    GlobalDataEntry.C_TRIPS_TABLE_LOADED + " TEXT," +
+                    GlobalDataEntry.C_SHAPES_TABLE_LOADED + " TEXT)";
+
+    public static final String SQL_DELETE_GLOBAL_DATA_TABLE =
+            "DROP TABLE IF EXISTS " + GlobalDataEntry.TABLE_NAME;
 }

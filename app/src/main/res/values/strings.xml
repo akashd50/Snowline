@@ -8,6 +8,7 @@
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="or">or</string>
+    <string name="one_time_setup">One time setup, please wait</string>
     <string name="day_after_tomorrow">Day After Tomorrow</string>
     <string name="digital_dialog_find_stop_schedule_B">Find Stop Schedule</string>
     <string name="home_scr_menu_find_schedule_stop_num">Find Stop Schedule</string>

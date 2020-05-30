@@ -1,17 +1,27 @@
 package com.greymatter.snowline.ui;
 
+import android.app.Dialog;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.greymatter.snowline.Handlers.ORSRequestHandler;
 import com.greymatter.snowline.db_v2.DBServices;
+import com.greymatter.snowline.db_v2.PopulateDBHelper;
 import com.greymatter.snowline.ui.helpers.HomeActivityUIHelper;
 import com.greymatter.snowline.Handlers.MapHandler;
 import com.greymatter.snowline.R;
@@ -42,18 +52,79 @@ public class HomeActivity extends FragmentActivity{
         setUpOnTouchEventListener();
 
         DBServices.initDB(this);
+        PopulateDBHelper.populateGlobalData();
+        final Dialog loadingDialog = generateLoadingDialog();
+        Handler onDBPopulated = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                loadingDialog.dismiss();
+            }
+        };
+        loadingDialog.show();
+        PopulateDBHelper.populateTransitDB(this, onDBPopulated);
+    }
+
+    public Dialog generateLoadingDialog() {
+        Dialog dialog  = new Dialog(this);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.loading_dialog);
+        ImageView gifImageView = dialog.findViewById(R.id.loading_dialog_image_view);
+        GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(gifImageView);
+        Glide.with(this)
+                .load(R.drawable.loading_anim_iii)
+                .placeholder(R.drawable.loading_anim_iii)
+                .centerCrop()
+                .crossFade()
+                .into(imageViewTarget);
+        return dialog;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        mapHandler.onRequestPermissionsResult(requestCode);
+        Handler onPermissionDenied = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                final Dialog dialog = new Dialog(HomeActivity.this);
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setCancelable(true);
+
+                View permDeniedDialog = LayoutInflater.from(HomeActivity.this).inflate(R.layout.permissions_denied_dialog, null);
+                Button permGrant = permDeniedDialog.findViewById(R.id.perm_denied_grant_perm);
+                Button cancel = permDeniedDialog.findViewById(R.id.perm_denied_cancel);
+
+                View.OnClickListener listener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        switch(v.getId()) {
+                            case R.id.perm_denied_grant_perm:
+                                mapHandler.requestPermissions();
+                                dialog.dismiss();
+                                break;
+                            case R.id.perm_denied_cancel:
+                                dialog.dismiss();
+                                break;
+                        }
+                    }
+                };
+                permGrant.setOnClickListener(listener);
+                cancel.setOnClickListener(listener);
+
+                dialog.setContentView(permDeniedDialog);
+
+                dialog.show();
+            }
+        };
+
+        mapHandler.onRequestPermissionsResult(requestCode, permissions, grantResults, onPermissionDenied);
     }
 
     private void setUpUIElements() {
         HomeActivityUIHelper.setKeyboardVisibilityListener(HomeActivity.this, planningTab);
     }
-
 
 
     @Override
@@ -82,9 +153,13 @@ public class HomeActivity extends FragmentActivity{
 
     @Override
     protected void onDestroy() {
+        PopulateDBHelper.onDestroy();
+        DBServices.close();
+
         mapFragment.onDestroy();
         super.onDestroy();
     }
+
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {

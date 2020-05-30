@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_centerInParent="true"
+    android:background="@drawable/stop_number_background">
+
+ <!--   <TextView
+        android:id="@+id/loading_dialog_loading_tview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loading"
+        android:fontFamily="monospace"
+        android:textSize="@dimen/text_medium"
+        android:textColor="@color/color_light_green"
+        android:shadowColor="@color/color_glow_green"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="10"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_gravity="center_horizontal" />-->
+
+    <ImageView
+        android:id="@+id/loading_dialog_image_view"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_margin="20dp"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:id="@+id/loading_dialog_finishing_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/one_time_setup"
+        android:fontFamily="monospace"
+        android:textSize="@dimen/text_small"
+        android:textColor="@color/color_light_green"
+        android:shadowColor="@color/color_glow_green"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="10"
+        android:layout_margin="20dp"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>

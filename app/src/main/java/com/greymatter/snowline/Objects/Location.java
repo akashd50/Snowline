@@ -6,6 +6,6 @@ public class Location implements TypeCommon {
     }
 
     public String toString() {
-        return "Stops near your location";
+        return "Nearby Stops";
     }
 }

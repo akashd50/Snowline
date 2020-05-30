@@ -103,7 +103,9 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
         LinearLayoutManager manager = new LinearLayoutManager(context);
         view.setLayoutManager(manager);
 
-        if(localList.get(position).get(0) instanceof RouteVariant) {
+        if(!localList.isEmpty() && !localList.get(position).isEmpty() &&
+                localList.get(position).get(0) instanceof RouteVariant) {
+
             ScheduleListAdapterR adapterR = null;
             View.OnClickListener listener = null;
             if(position >= localListeners.size()) {
@@ -125,7 +127,9 @@ public class NavigationalViewAdapterR extends RecyclerView.Adapter<ListLineHolde
             adapterR.notifyDataSetChanged();
             localViews.put(currentList.hashCode(), view);
 
-        }else if(localList.get(position).get(0) instanceof Stop) {
+        }else if(!localList.isEmpty() && !localList.get(position).isEmpty() &&
+                localList.get(position).get(0) instanceof Stop) {
+
             StopsListAdapterR adapterR = null;
             View.OnClickListener listener = null;
             if(position >= localListeners.size()) {

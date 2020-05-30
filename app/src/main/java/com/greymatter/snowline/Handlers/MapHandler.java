@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.greymatter.snowline.Objects.ORSDirection;
 import com.greymatter.snowline.R;
@@ -51,7 +53,10 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
         this.currentZoomLevel = Constants.ZOOM_STREETS;
         this.followUserLocation = true;
         this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
+        this.initLocationUpdateRequest();
+    }
 
+    private void initLocationUpdateRequest() {
         LocationRequest locationRequest = LocationRequest.create().setInterval(10000).setFastestInterval(5000).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         fusedLocationClient.requestLocationUpdates(locationRequest, this, Looper.getMainLooper());
     }
@@ -61,8 +66,21 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
         lastKnownLatLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
     }
 
-    public void onRequestPermissionsResult(int requestCode) {
-        currentMap.setMyLocationEnabled(true);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults, Handler handler) {
+        switch (requestCode) {
+            case 100:
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    currentMap.setMyLocationEnabled(true);
+                    this.initLocationUpdateRequest();
+                }else{
+                    //show dialog informing the user
+                    handler.obtainMessage(Constants.FAIL).sendToTarget();
+                }
+                break;
+        }
+
     }
 
     @Override
@@ -71,17 +89,29 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
         currentMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(
                 activity, R.raw.map_style_json));
 
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION},66);
-        } else {
-            // Permission has already been granted
+        if (!requestPermissions()) {
             currentMap.setMyLocationEnabled(true);
         }
     }
 
+    public boolean requestPermissions() {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION},100);
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+
+
     public void drawRouteOnMap(ORSDirection direction) {
-        currentMap.addPolyline(new PolylineOptions().clickable(true).addAll(direction.getDrawableRoute()));
+        currentMap.clear();
+        Polyline routeLine = currentMap.addPolyline(new PolylineOptions().clickable(true).
+                addAll(direction.getDrawableRoute()));
+        routeLine.setWidth(10);
+        routeLine.setColor(context.getColor(R.color.color_glow_green));
     }
 
     @Override

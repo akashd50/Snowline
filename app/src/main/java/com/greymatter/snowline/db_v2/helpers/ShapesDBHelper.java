@@ -5,28 +5,26 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
+import com.greymatter.snowline.db_v2.DBServices;
+import com.greymatter.snowline.db_v2.containers.ShapeCursorContainer;
+
 import static com.greymatter.snowline.db_v2.contracts.ShapesContract.ShapesEntry.*;
 
 public class ShapesDBHelper {
-    private DBOpenHelper databaseHelper;
     private static String[] columnNames = {BaseColumns._ID, C_SHAPE_ID, C_SHAPE_PT_LAT, C_SHAPE_PT_LON, C_SHAPE_PT_SEQUENCE};
-    private int id;
-    public ShapesDBHelper(DBOpenHelper dbRef) {
-        this.databaseHelper = dbRef;
-        id=0;
+    public ShapesDBHelper() {
     }
 
-    public void insert(String[] toInsert) {
+    public void insert(int id, String[] toInsert) {
         ContentValues cv = new ContentValues();
-        cv.put(columnNames[0], id++);
+        cv.put(columnNames[0], id);
         for(int i=1;i<columnNames.length;i++) {
             cv.put(columnNames[i], toInsert[i-1]);
         }
-        databaseHelper.getWritableDatabase().insert(TABLE_NAME, null, cv);
+        DBServices.getWritableDB().insert(TABLE_NAME, null, cv);
     }
 
-    public Cursor get(String shapeID) {
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+    public ShapeCursorContainer get(String shapeID) {
         String[] projection = columnNames;
 
         String selection = C_SHAPE_ID + " = ?";
@@ -34,7 +32,7 @@ public class ShapesDBHelper {
 
         //String sortOrder = COLUMN_NAME_SUBTITLE + " DESC";
 
-        Cursor cursor = db.query(
+        Cursor cursor = DBServices.getReadableDB().query(
                 TABLE_NAME,             // The table to query
                 projection,             // The array of columns to return (pass null to get all)
                 selection,              // The columns for the WHERE clause
@@ -43,6 +41,13 @@ public class ShapesDBHelper {
                 null,           // don't filter by row groups
                 null           // The sort order
         );
-        return cursor;
+        return new ShapeCursorContainer(cursor);
+    }
+
+
+    public void deleteWhereIdGreaterThan(int id) {
+        String selection = "_id >= ?";
+        String[] selectionArgs = {id+""};
+        DBServices.getWritableDB().delete(TABLE_NAME, selection, selectionArgs);
     }
 }

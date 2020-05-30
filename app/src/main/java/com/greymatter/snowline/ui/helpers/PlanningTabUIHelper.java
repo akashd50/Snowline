@@ -1,5 +1,6 @@
 package com.greymatter.snowline.ui.helpers;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
@@ -7,10 +8,13 @@ import android.os.Handler;
 import android.util.Log;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CircleOptions;
+import com.greymatter.snowline.DataParsers.ORSDirectionsParser;
 import com.greymatter.snowline.DataParsers.RouteParser;
 import com.greymatter.snowline.DataParsers.StopParser;
 import com.greymatter.snowline.DataParsers.StopScheduleParser;
+import com.greymatter.snowline.Handlers.ORSRequestHandler;
 import com.greymatter.snowline.Objects.ORSDirection;
+import com.greymatter.snowline.Objects.ORSRequest;
 import com.greymatter.snowline.Objects.Route;
 import com.greymatter.snowline.Objects.RouteVariant;
 import com.greymatter.snowline.Objects.WTRequest;
@@ -20,6 +24,12 @@ import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.Objects.StopSchedule;
 import com.greymatter.snowline.Objects.TypeCommon;
 import com.greymatter.snowline.app.Constants;
+import com.greymatter.snowline.db_v2.containers.ShapeCursorContainer;
+import com.greymatter.snowline.db_v2.containers.TripCursorContainer;
+import com.greymatter.snowline.db_v2.contracts.TripsContract;
+import com.greymatter.snowline.db_v2.helpers.ShapesDBHelper;
+import com.greymatter.snowline.db_v2.helpers.TripsDBHelper;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,31 +83,21 @@ public class PlanningTabUIHelper {
     }
 
     public static ORSDirection getDrawableRoute(RouteVariant variant) {
-        ArrayList<Stop> routeStops = getRouteStops(variant);
+        ORSDirection toReturn = new ORSDirection();
 
-        Comparator<Stop> stopComparator = new Comparator<Stop>() {
-            @Override
-            public int compare(Stop o1, Stop o2) {
-                return Integer.parseInt(o1.getNumber()) - Integer.parseInt(o2.getNumber());
+        ContentValues params = new ContentValues();
+        params.put(TripsContract.TripsEntry.C_ROUTE_ID, variant.getKey());
+        params.put(TripsContract.TripsEntry.C_TRIP_HEADSIGN, variant.getVariantName());
+
+        TripCursorContainer tripCursorContainer = new TripsDBHelper().get(params);
+        if(tripCursorContainer.moveToNext()) {
+            String shapeID = tripCursorContainer.getShapeID();
+            ShapeCursorContainer shapeCursorContainer = new ShapesDBHelper().get(shapeID);
+            while(shapeCursorContainer.moveToNext()){
+                toReturn.addLatLng(shapeCursorContainer.getLatLng());
             }
-        };
-        routeStops.sort(stopComparator);
-        System.out.println(routeStops);
-        /*ORSDirection direction = null;
-        Log.v("Stops List Size", routeStops.size()+"");
-
-        ORSRequest request = new ORSRequest();
-        request = request.asGeoJson().addAllCoordinates(routeStops);
-
-        StringBuilder response = ORSRequestHandler.makeRequest(request);
-
-        try {
-            direction = ORSDirectionsParser.parse(new JSONObject(response.toString()));
-        }catch (JSONException e) {
-            e.printStackTrace();
-        }*/
-        //return direction;
-        return null;
+        }
+        return toReturn;
     }
 
     public static ArrayList<TypeCommon> getNearbyStops(Location location, int radius){
