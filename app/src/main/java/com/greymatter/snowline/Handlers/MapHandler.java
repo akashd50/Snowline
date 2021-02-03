@@ -18,18 +18,20 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.greymatter.snowline.Objects.ORSDirection;
+import com.greymatter.snowline.Objects.DrawableRoute;
+import com.greymatter.snowline.Objects.Stop;
 import com.greymatter.snowline.R;
 import com.greymatter.snowline.app.Constants;
 
@@ -104,14 +106,37 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
         }
     }
 
-
-
-    public void drawRouteOnMap(ORSDirection direction) {
+    public void drawOnMap(DrawableRoute direction) {
         currentMap.clear();
+        currentMap.setOnMarkerClickListener(null);
+
         Polyline routeLine = currentMap.addPolyline(new PolylineOptions().clickable(true).
                 addAll(direction.getDrawableRoute()));
         routeLine.setWidth(10);
         routeLine.setColor(context.getColor(R.color.color_glow_green));
+        routeLine.setZIndex(1);
+
+        currentMap.addMarker(new MarkerOptions().position(direction.getUserStop().getCentre().getLatLng())
+                .title("Your Stop: " + direction.getUserStop().getNumber())
+                .flat(true));
+
+        for(Stop stop : direction.getDrawableStops()) {
+            Circle c = currentMap.addCircle(new CircleOptions()
+                    .clickable(true)
+                    .radius(20)
+                    .fillColor(context.getColor(R.color.color_glow_red))
+                    .center(stop.getCentre().getLatLng()));
+            c.setZIndex(2);
+            c.setTag(stop);
+            c.setStrokeWidth(1);
+        }
+
+        currentMap.setOnCircleClickListener(new GoogleMap.OnCircleClickListener() {
+            @Override
+            public void onCircleClick(Circle circle) {
+
+            }
+        });
     }
 
     @Override
@@ -132,12 +157,12 @@ public class MapHandler extends LocationCallback implements GoogleMap.OnMyLocati
             System.out.println(location.toString());
             setLocation(location);
             if(followUserLocation()) {
-                animate(getLastKnownLatLng());
+                focusOn(getLastKnownLatLng());
             }
         }
     }
 
-    public void animate(LatLng location) {
+    public void focusOn(LatLng location) {
         currentMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                 CameraPosition.fromLatLngZoom(location, getCurrentZoomLevel())));
     }

@@ -77,6 +77,11 @@ public class WTRequest {
         return this;
     }
 
+    public WTRequest variant(String variant) {
+        this.update("&variant="+variant);
+        return this;
+    }
+
     public WTRequest latLon (String lat, String lon) {
         this.update("&lat="+lat+"&lon="+lon);
         return this;

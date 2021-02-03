@@ -52,16 +52,16 @@ public class HomeActivity extends FragmentActivity{
         setUpOnTouchEventListener();
 
         DBServices.initDB(this);
-        PopulateDBHelper.populateGlobalData();
-        final Dialog loadingDialog = generateLoadingDialog();
-        Handler onDBPopulated = new Handler(Looper.getMainLooper()){
-            @Override
-            public void handleMessage(@NonNull Message msg) {
-                loadingDialog.dismiss();
-            }
-        };
-        loadingDialog.show();
-        PopulateDBHelper.populateTransitDB(this, onDBPopulated);
+//        PopulateDBHelper.populateGlobalData();
+//        final Dialog loadingDialog = generateLoadingDialog();
+//        Handler onDBPopulated = new Handler(Looper.getMainLooper()){
+//            @Override
+//            public void handleMessage(@NonNull Message msg) {
+//                loadingDialog.dismiss();
+//            }
+//        };
+//        loadingDialog.show();
+//        PopulateDBHelper.populateTransitDB(this, onDBPopulated);
     }
 
     public Dialog generateLoadingDialog() {
@@ -123,7 +123,7 @@ public class HomeActivity extends FragmentActivity{
     }
 
     private void setUpUIElements() {
-        HomeActivityUIHelper.setKeyboardVisibilityListener(HomeActivity.this, planningTab);
+        //HomeActivityUIHelper.setKeyboardVisibilityListener(HomeActivity.this, planningTab);
     }
 
 

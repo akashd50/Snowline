@@ -7,7 +7,6 @@ public class RouteVariant extends Route {
     private Bus busInfo;
 
     public RouteVariant(String rKey, String rName, String rNumber){super(rKey, rNumber, rName);}
-    public RouteVariant(Route route){super(route.getKey(), route.getNumber(), route.getName());}
     public RouteVariant(){}
 
     public RouteVariant setRouteInfo(Route route){

@@ -30,9 +30,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class HomeActivityUIHelper {
-
-
-
     public static AlertDialog generateStopDialog(final Stop stop, final Activity activity, ArrayList<Route> stopRoutes) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         View view = activity.getLayoutInflater().inflate(R.layout.digital_stop_sign,null);

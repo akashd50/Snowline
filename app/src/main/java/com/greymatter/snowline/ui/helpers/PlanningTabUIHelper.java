@@ -8,13 +8,10 @@ import android.os.Handler;
 import android.util.Log;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CircleOptions;
-import com.greymatter.snowline.DataParsers.ORSDirectionsParser;
 import com.greymatter.snowline.DataParsers.RouteParser;
 import com.greymatter.snowline.DataParsers.StopParser;
 import com.greymatter.snowline.DataParsers.StopScheduleParser;
-import com.greymatter.snowline.Handlers.ORSRequestHandler;
-import com.greymatter.snowline.Objects.ORSDirection;
-import com.greymatter.snowline.Objects.ORSRequest;
+import com.greymatter.snowline.Objects.DrawableRoute;
 import com.greymatter.snowline.Objects.Route;
 import com.greymatter.snowline.Objects.RouteVariant;
 import com.greymatter.snowline.Objects.WTRequest;
@@ -35,7 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
+
 import static com.greymatter.snowline.app.Constants.HOME_ACTIVITY_HELPER;
 import static com.greymatter.snowline.app.Constants.STOP;
 import static com.greymatter.snowline.app.Constants.STOP_SCHEDULE;
@@ -64,13 +61,13 @@ public class PlanningTabUIHelper {
         ArrayList<Stop> routeStopsList = new ArrayList<>();
 
         WTRequest request = new WTRequest();
-        request = request.base().v3().stops().asJson().route(routeVariant.getNumber());
+        request = request.base().v3().stops().asJson().variant(routeVariant.getVariantKey());
         StringBuilder response = WTRequestHandler.makeRequest(request);
 
         try {
             JSONObject root = new JSONObject(response.toString());
             JSONArray stopsList = root.getJSONArray(Constants.STOPS);
-            for(int i=0;i<50;i++) {
+            for(int i=0;i<stopsList.length();i++) {
                 JSONObject stop = stopsList.getJSONObject(i);
                 Stop currentStop = StopParser.parse(stop);
                 routeStopsList.add(currentStop);
@@ -82,8 +79,8 @@ public class PlanningTabUIHelper {
         return routeStopsList;
     }
 
-    public static ORSDirection getDrawableRoute(RouteVariant variant) {
-        ORSDirection toReturn = new ORSDirection();
+    public static DrawableRoute getDrawableRoute(RouteVariant variant) {
+        DrawableRoute toReturn = new DrawableRoute();
 
         ContentValues params = new ContentValues();
         params.put(TripsContract.TripsEntry.C_ROUTE_ID, variant.getKey());
@@ -94,9 +91,12 @@ public class PlanningTabUIHelper {
             String shapeID = tripCursorContainer.getShapeID();
             ShapeCursorContainer shapeCursorContainer = new ShapesDBHelper().get(shapeID);
             while(shapeCursorContainer.moveToNext()){
-                toReturn.addLatLng(shapeCursorContainer.getLatLng());
+                toReturn.addToDrawableRoute(shapeCursorContainer.getLatLng());
             }
         }
+
+        toReturn.addToDrawableStops(getRouteStops(variant));
+
         return toReturn;
     }
 
